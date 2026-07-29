@@ -1,3 +1,5 @@
+@AGENTS.md
+
 # Web Engineering Conventions (Next.js + TypeScript)
 
 These conventions govern all code under `web/`.
