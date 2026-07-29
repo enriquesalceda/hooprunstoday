@@ -18,30 +18,10 @@ This codebase follows **Test-Driven Development (TDD)**:
 2. **Green**: write the minimum code to make it pass
 3. **Refactor**: clean up while keeping tests green
 
-## Architecture (backend)
+## Backend
 
-Clean Architecture. Dependencies point inward; inner layers know nothing
-about outer layers.
-
-```
-cmd/api               # wiring, config, dependency injection
-internal/handler      # HTTP handlers, request/response mapping
-internal/service      # use cases, business logic
-internal/domain       # entities, repository interfaces — no dependencies
-internal/repository   # repository implementations
-```
-
-Define interfaces in the layer that uses them, inject via constructors —
-no global state.
-
-## Testing
-
-- Setup-Exercise-Expectations-Cleanup structure inside `t.Run` blocks
-- Descriptive names that read like sentences: `"health endpoint returns ok status"`
-- `github.com/stretchr/testify/require` for assertions
-- External test packages (`package foo_test`) for black-box testing
-- Hand-rolled fakes/stubs/spies — no mocking libraries
-- Integration tests behind `//go:build integration`
+Go, Clean Architecture, strict TDD. Full conventions — architecture layers,
+use case pattern, testing rules, logging — live in `backend/CLAUDE.md`.
 
 ## Commands
 
