@@ -1,4 +1,28 @@
 services:
+  # One-shot migration job — mirrors CI's "apply then migrate then serve"
+  # topology so the api never runs migrations at startup.
+  migrate:
+    build: ./backend
+    entrypoint: ["/migrate"]
+    restart: "no"
+    environment:
+      DATABASE_URL: postgres://hooprunstoday:hooprunstoday@db:5432/hooprunstoday?sslmode=disable
+    depends_on:
+      db:
+        condition: service_healthy
+
+  api:
+    build: ./backend
+    ports:
+      - "8080:8080"
+    environment:
+      DATABASE_URL: postgres://hooprunstoday:hooprunstoday@db:5432/hooprunstoday?sslmode=disable
+      # Pinned to the project's Clerk dev instance; override via root .env
+      CLERK_ISSUER: ${CLERK_ISSUER:-https://replace-with-your-instance.clerk.accounts.dev}
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+
   db:
     image: postgres:16-alpine
     environment:
