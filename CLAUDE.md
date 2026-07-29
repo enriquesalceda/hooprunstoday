@@ -18,10 +18,20 @@ This codebase follows **Test-Driven Development (TDD)**:
 2. **Green**: write the minimum code to make it pass
 3. **Refactor**: clean up while keeping tests green
 
-## Backend
+## Package Conventions
 
-Go, Clean Architecture, strict TDD. Full conventions — architecture layers,
-use case pattern, testing rules, logging — live in `backend/CLAUDE.md`.
+Each package carries its own CLAUDE.md with full conventions:
+
+- `backend/CLAUDE.md` — Go, Clean Architecture layers, use case pattern,
+  testing rules, logging.
+- `web/CLAUDE.md` — Next.js + TypeScript, clean architecture adapted for
+  React, Vitest + Testing Library + MSW.
+- `mobile/CLAUDE.md` — Expo + React Native, mirrors the web conventions
+  with jest-expo + React Native Testing Library.
+
+All three share the same spine: dependencies point inward, framework at
+the edges, a pure framework-free `domain/`, strict TDD, no mock libraries
+for code we own.
 
 ## Commands
 
