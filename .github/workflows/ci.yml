@@ -35,6 +35,9 @@ jobs:
               - 'backend/**'
             infra:
               - 'infra/**'
+              # Workflow changes alter how deploys run — treat them as infra
+              # so a workflow-only push still applies.
+              - '.github/workflows/**'
 
   # ---------------------------------------------------------------------------
   # Backend: tests + static checks
@@ -150,6 +153,8 @@ jobs:
       needs.changes.outputs.backend == 'true'
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # full history: the image tag is the last backend commit
 
       - uses: google-github-actions/auth@v2
         with:
@@ -161,11 +166,15 @@ jobs:
       - name: Configure Docker for Artifact Registry
         run: gcloud auth configure-docker ${{ env.GCP_REGION }}-docker.pkg.dev --quiet
 
+      # Tag with the last commit that touched backend/ (== github.sha on
+      # backend pushes). Deploy jobs resolve the same tag, so infra-only
+      # pushes reuse the image already in the registry.
       - name: Build and push
         working-directory: backend
         run: |
-          docker build -t "$IMAGE:${{ github.sha }}" .
-          docker push "$IMAGE:${{ github.sha }}"
+          TAG=$(git log -1 --format=%H -- .)
+          docker build -t "$IMAGE:$TAG" .
+          docker push "$IMAGE:$TAG"
 
   # ---------------------------------------------------------------------------
   # Deploy: main -> staging automatically
@@ -182,9 +191,13 @@ jobs:
     env:
       NEON_API_KEY: ${{ secrets.NEON_API_KEY }}
       VERCEL_API_TOKEN: ${{ secrets.VERCEL_API_TOKEN }}
-      TF_VAR_image_tag: ${{ github.sha }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Resolve image tag (last backend commit)
+        run: echo "TF_VAR_image_tag=$(git log -1 --format=%H -- backend/)" >> "$GITHUB_ENV"
 
       - uses: google-github-actions/auth@v2
         with:
@@ -217,9 +230,13 @@ jobs:
     env:
       NEON_API_KEY: ${{ secrets.NEON_API_KEY }}
       VERCEL_API_TOKEN: ${{ secrets.VERCEL_API_TOKEN }}
-      TF_VAR_image_tag: ${{ github.sha }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Resolve image tag (last backend commit)
+        run: echo "TF_VAR_image_tag=$(git log -1 --format=%H -- backend/)" >> "$GITHUB_ENV"
 
       - uses: google-github-actions/auth@v2
         with:
