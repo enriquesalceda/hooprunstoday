@@ -205,6 +205,9 @@ jobs:
           service_account: ${{ vars.GCP_DEPLOYER_SERVICE_ACCOUNT }}
 
       - uses: hashicorp/setup-terraform@v3
+        with:
+          # No wrapper: it pollutes stdout, breaking `output -raw` capture
+          terraform_wrapper: false
 
       - name: Init
         working-directory: infra
@@ -217,6 +220,14 @@ jobs:
       - name: Apply
         working-directory: infra
         run: terraform apply -auto-approve -var-file=envs/staging.tfvars
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: backend/go.mod
+
+      - name: Run migrations
+        working-directory: backend
+        run: DATABASE_URL="$(terraform -chdir=../infra output -raw db_connection_uri)" go run ./cmd/migrate
 
   # ---------------------------------------------------------------------------
   # Deploy: prod behind a required-reviewer gate (GitHub Environment "prod")
@@ -244,6 +255,8 @@ jobs:
           service_account: ${{ vars.GCP_DEPLOYER_SERVICE_ACCOUNT }}
 
       - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_wrapper: false
 
       - name: Init
         working-directory: infra
@@ -256,6 +269,14 @@ jobs:
       - name: Apply
         working-directory: infra
         run: terraform apply -auto-approve -var-file=envs/prod.tfvars
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: backend/go.mod
+
+      - name: Run migrations
+        working-directory: backend
+        run: DATABASE_URL="$(terraform -chdir=../infra output -raw db_connection_uri)" go run ./cmd/migrate
 
   # ---------------------------------------------------------------------------
   # Web (Vercel) deploys itself via the GitHub integration — no job needed.

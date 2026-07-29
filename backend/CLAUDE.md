@@ -212,6 +212,24 @@ func (s *spyRunStore) Save(_ context.Context, r domain.Run) error {
   body or any externally-sourced text must be capped to a sane length so a
   pathological payload can't flood the logs.
 
+## Database Migrations
+
+- **goose** with plain SQL files in
+  `internal/infrastructure/postgres/migrations/`, sequentially numbered.
+  Create with `make db.migration name=add_runs_table`; apply locally with
+  `make db.migrate`.
+- Migrations are embedded in the binary (`postgres.Migrate`) — the same
+  files run in integration tests, against local Docker Postgres, and in CI.
+- **CI applies migrations**, not the app: a step after `terraform apply`
+  in each deploy job. Never run migrations on app startup.
+- **Expand/contract discipline.** Every migration must be compatible with
+  the code revision currently running: add-then-migrate-then-drop, never
+  break the running schema. This is what makes deploys and rollbacks boring.
+- **Down migrations are local-dev convenience only.** Prod recovery is a
+  new forward migration, never a rollback.
+- Migrations use the **direct (unpooled)** connection string. If the app
+  ever moves to Neon's pooled endpoint, migrations must keep the direct one.
+
 ## Project Layout
 
 ```
