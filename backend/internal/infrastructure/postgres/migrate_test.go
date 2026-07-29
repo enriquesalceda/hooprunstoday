@@ -34,6 +34,17 @@ func TestMigrate(t *testing.T) {
 		require.NoError(t, db.QueryRowContext(ctx,
 			`SELECT EXISTS (SELECT 1 FROM pg_extension WHERE extname = 'citext')`).Scan(&hasCitext))
 		require.True(t, hasCitext, "citext extension should be installed by the init migration")
+
+		var playersTable sql.NullString
+		require.NoError(t, db.QueryRowContext(ctx,
+			`SELECT to_regclass('public.players')::text`).Scan(&playersTable))
+		require.True(t, playersTable.Valid, "players table should exist")
+
+		var handleType string
+		require.NoError(t, db.QueryRowContext(ctx,
+			`SELECT udt_name FROM information_schema.columns
+			 WHERE table_name = 'players' AND column_name = 'handle'`).Scan(&handleType))
+		require.Equal(t, "citext", handleType, "handle must be case-insensitive")
 	})
 }
 
@@ -51,7 +62,7 @@ func openTestDB(t *testing.T) *sql.DB {
 
 	// Cleanup
 	t.Cleanup(func() {
-		_, err := db.Exec(`DROP TABLE IF EXISTS goose_db_version; DROP EXTENSION IF EXISTS citext`)
+		_, err := db.Exec(`DROP TABLE IF EXISTS players; DROP TABLE IF EXISTS goose_db_version; DROP EXTENSION IF EXISTS citext`)
 		require.NoError(t, err)
 		require.NoError(t, db.Close())
 	})
