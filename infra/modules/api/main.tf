@@ -3,15 +3,8 @@ locals {
   image        = "${var.region}-docker.pkg.dev/${var.project_id}/${var.app_name}/api:${var.image_tag}"
 }
 
-# One shared Docker repo for all environments; first environment applied
-# creates it, the rest adopt it. Kept here (not bootstrap) so it lives with
-# the things that consume it.
-resource "google_artifact_registry_repository" "this" {
-  count         = var.environment == "staging" ? 1 : 0
-  location      = var.region
-  repository_id = var.app_name
-  format        = "DOCKER"
-}
+# The shared Docker repo lives in ../../bootstrap — CI pushes images before
+# the first environment apply, so it must predate this stack.
 
 resource "google_service_account" "runtime" {
   account_id   = "${var.app_name}-api-${var.environment}"

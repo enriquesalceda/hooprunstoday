@@ -40,6 +40,17 @@ resource "google_project_service" "required" {
   disable_on_destroy = false
 }
 
+# One shared Docker repo for all environments. Lives here, not in the main
+# stack: CI pushes the image BEFORE the first staging apply, so the repo has
+# to exist before any environment does.
+resource "google_artifact_registry_repository" "docker" {
+  location      = var.region
+  repository_id = var.app_name
+  format        = "DOCKER"
+
+  depends_on = [google_project_service.required]
+}
+
 resource "google_storage_bucket" "tf_state" {
   name                        = "${var.project_id}-tf-state"
   location                    = var.region
