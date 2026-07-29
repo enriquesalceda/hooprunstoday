@@ -1,4 +1,4 @@
-package handler_test
+package http_test
 
 import (
 	"encoding/json"
@@ -6,7 +6,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/enriquesalceda/hooprunstoday/backend/internal/handler"
+	adapterhttp "github.com/enriquesalceda/hooprunstoday/backend/internal/adapter/http"
 	"github.com/stretchr/testify/require"
 )
 
@@ -17,7 +17,7 @@ func TestHealth(t *testing.T) {
 		rec := httptest.NewRecorder()
 
 		// Exercise
-		handler.Health(rec, req)
+		adapterhttp.Health(rec, req)
 
 		// Expectations
 		require.Equal(t, http.StatusOK, rec.Code)

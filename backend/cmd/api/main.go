@@ -10,7 +10,7 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/enriquesalceda/hooprunstoday/backend/internal/handler"
+	adapterhttp "github.com/enriquesalceda/hooprunstoday/backend/internal/adapter/http"
 )
 
 func main() {
@@ -23,7 +23,7 @@ func main() {
 	}
 
 	mux := http.NewServeMux()
-	mux.HandleFunc("GET /api/v1/health", handler.Health)
+	mux.HandleFunc("GET /api/v1/health", adapterhttp.Health)
 
 	server := &http.Server{
 		Addr:              ":" + port,
