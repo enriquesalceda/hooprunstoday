@@ -1,4 +1,4 @@
-.PHONY: test test.integration test.all run docker.detach docker.down fmt db.migrate db.migration
+.PHONY: test test.integration test.web test.all run docker.detach docker.down fmt db.migrate db.migration
 
 test:
 	cd backend && go test ./...
@@ -6,7 +6,10 @@ test:
 test.integration:
 	cd backend && go test -tags integration ./...
 
-test.all: test test.integration
+test.web:
+	cd web && npx vitest run
+
+test.all: test test.integration test.web
 
 run:
 	cd backend && go run ./cmd/api
