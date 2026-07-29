@@ -1,0 +1,11 @@
+/* Three animations exist. Everything else is instant — no page transitions, no fades. */
+:root {
+  --ease-snap: cubic-bezier(0.2, 0.9, 0.2, 1);
+  --dur-snap: 280ms;   /* slider releasing back to 0 */
+  --dur-flash: 750ms;  /* LOCKED. confirmation hold */
+  --dur-pulse: 1.6s;   /* live status dot */
+}
+@keyframes hr-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.15; }
+}

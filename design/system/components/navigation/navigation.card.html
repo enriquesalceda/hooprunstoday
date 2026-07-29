@@ -1,0 +1,61 @@
+<!-- @dsCard group="Components" viewport="700x300" name="Navigation" subtitle="Segmented control, bottom nav, header, back link" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Navigation</title>
+<link rel="stylesheet" href="../../styles.css">
+<script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script src="../../_ds_bundle.js"></script>
+<style>
+  html, body { margin: 0; background: var(--surface-app); color: var(--text-primary); font-family: var(--font-mono); }
+  #root { padding: 18px 20px; }
+  .lbl { font-family: var(--font-mono); font-weight: 500; font-size: var(--mono-2); color: var(--text-faint); letter-spacing: var(--track-label); }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+function ns(name) {
+  for (const k of Object.keys(window)) {
+    if (k === 'React' || k === 'ReactDOM' || k === 'Babel') continue;
+    try { const v = window[k]; if (v && typeof v === 'object' && typeof v[name] === 'function') return v; } catch (e) {}
+  }
+  return {};
+}
+
+const { SegmentedControl, BottomNav, AppHeader, BackLink } = ns('SegmentedControl');
+
+function Demo() {
+  const [tab, setTab] = React.useState('street');
+  const [screen, setScreen] = React.useState('radar');
+  const [fmt, setFmt] = React.useState('street');
+  return (
+    <div style={{ display: 'grid', gap: 16 }}>
+      <div style={{ border: 'var(--border-hairline)' }}>
+        <AppHeader platform="web" geofence="NEWTOWN, SYD" status="SYS_ACTIVE" clock="18:42:07 LOCAL">
+          <SegmentedControl value={screen} onChange={setScreen} padY={10} style={{ flex: 'none' }}
+            options={[{ value: 'radar', label: 'RADAR' }, { value: 'log', label: 'LOG GAME' }, { value: 'you', label: 'YOU' }]} />
+        </AppHeader>
+      </div>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, alignItems: 'start' }}>
+        <SegmentedControl value={tab} onChange={setTab}
+          options={[{ value: 'street', label: '[ STREET CRED ]' }, { value: 'league', label: '[ LEAGUE STATS ]' }]} />
+        <SegmentedControl value={fmt} onChange={setFmt} tracking="var(--track-label)"
+          options={[{ value: 'street', label: 'CASUAL STREET RUN' }, { value: 'pro', label: 'OFFICIAL LEAGUE FIXTURE' }]} />
+      </div>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
+        <BackLink label="RADAR" />
+        <span className="lbl">HOVER A SEGMENT OR THE BACK LINK — MUTED GOES WHITE, NOTHING MOVES</span>
+      </div>
+      <BottomNav value={screen} onChange={setScreen}
+        options={[{ value: 'radar', label: 'RADAR' }, { value: 'log', label: 'LOG GAME' }, { value: 'you', label: 'YOU' }]} />
+    </div>
+  );
+}
+ReactDOM.createRoot(document.getElementById('root')).render(<Demo />);
+</script>
+</body>
+</html>

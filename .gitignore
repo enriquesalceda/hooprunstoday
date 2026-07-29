@@ -1,1 +1,21 @@
 .DS_Store
+
+# Go
+backend/bin/
+backend/tmp/
+
+# Node
+node_modules/
+.next/
+.expo/
+
+# Terraform
+**/.terraform/
+*.tfstate
+*.tfstate.*
+*.tfplan
+
+# Env / secrets
+.env
+.env.*
+!.env.example

@@ -1,0 +1,51 @@
+/* Two families, zero exceptions.
+   Anton = numbers, names, headlines. Monospace = every label, button, and datum.
+   Everything is UPPERCASE except bulletin body copy. */
+:root {
+  --font-display: 'Anton', 'Arial Black', Impact, sans-serif;
+  --font-mono: ui-monospace, Menlo, 'SF Mono', 'Roboto Mono', monospace;
+  --font-ui: Helvetica, Arial, sans-serif; /* the .TODAY bar + paper chrome only */
+
+  /* display scale (Anton, always 400, always caps) */
+  --display-1: 20px;  /* logo lockup, web */
+  --display-2: 34px;  /* court name mobile, stat number mobile */
+  --display-3: 40px;  /* screen title, profile name */
+  --display-4: 46px;  /* court name web, stat number web */
+  --display-5: 56px;  /* screen title web */
+  --display-6: 76px;  /* score input web */
+  --display-7: 96px;  /* court name, check-in web */
+  --display-8: 120px; /* street score web */
+  --display-9: 140px; /* LOCKED flash web */
+  --lh-display-tight: 0.8;  /* the big score */
+  --lh-display: 0.92;       /* stacked headlines */
+  --lh-display-loose: 0.95; /* wrapping court names */
+  --lh-logo: 0.84;          /* brand lockup only */
+  --track-display: 0;
+  --track-logo: 1px;
+
+  /* mono scale (labels, data, actions) */
+  --mono-1: 8.5px;  /* footnotes, game-log meta */
+  --mono-2: 9px;    /* section labels, telemetry */
+  --mono-3: 9.5px;  /* row metadata */
+  --mono-4: 10px;   /* nav, tabs, buttons */
+  --mono-5: 10.5px; /* game log, roster rows */
+  --mono-6: 11px;   /* @handles, rank */
+  --mono-7: 12px;   /* transmit button */
+  --mono-8: 13px;   /* bulletin body, field values */
+  --mono-9: 14px;   /* web field values */
+  --weight-data: 500;   /* anything read */
+  --weight-action: 700; /* anything tapped */
+
+  /* tracking — grows with importance, never below 0 */
+  --track-label: 0.06em;   /* segment labels with long copy */
+  --track-nav: 0.1em;      /* nav, tabs, banners */
+  --track-slider: 0.12em;  /* slide-to-engage */
+  --track-action: 0.14em;  /* primary button */
+  --track-bar: 0.3em;      /* .TODAY bar, small */
+  --track-bar-lg: 0.4em;   /* .TODAY bar, lockup */
+
+  /* body copy — the only lowercase, non-mono-cased text in the product */
+  --body-size: 13px;
+  --body-lh: 1.45;
+  --body-lh-web: 1.5;
+}

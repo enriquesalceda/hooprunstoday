@@ -1,0 +1,30 @@
+<!-- @dsCard group="Spacing" viewport="700x200" name="Motion" subtitle="Three animations exist; everything else is an instant cut" -->
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><link rel="stylesheet" href="../styles.css">
+<style>
+  html,body{margin:0;background:var(--surface-app);font-family:var(--font-mono);font-weight:500;font-size:var(--mono-2);}
+  .wrap{padding:18px 20px;}
+  .row{display:flex;gap:12px;}
+  .col{display:flex;flex-direction:column;}
+  .k{font-size:var(--mono-2);color:var(--text-faint);white-space:nowrap;}
+  .kk{font-size:var(--mono-1);color:var(--text-faint);white-space:nowrap;}
+  .v{font-size:var(--mono-2);color:var(--text-secondary);white-space:nowrap;}
+  
+</style></head><body><div class="wrap">
+<div class="col" style="gap:14px;">
+  <div style="display:flex;align-items:center;gap:12px;">
+    <span style="display:inline-block;width:var(--dot-size);height:var(--dot-size);background:var(--paper-000);border-radius:var(--radius-dot);animation:hr-pulse var(--dur-pulse) infinite;"></span>
+    <span class="v">SYS_ACTIVE</span>
+    <span class="kk">--dur-pulse 1.6S · OPACITY 1 → 0.15 → 1 · INFINITE</span>
+  </div>
+  <div style="display:flex;align-items:center;gap:12px;">
+    <div style="width:180px;height:22px;background:var(--surface-track);border:var(--border-interactive);position:relative;"><div style="position:absolute;left:0;top:0;bottom:0;width:22px;background:var(--paper-000);"></div></div>
+    <span class="kk">--dur-snap 280MS --ease-snap CUBIC-BEZIER(0.2, 0.9, 0.2, 1) · SLIDER RELEASE</span>
+  </div>
+  <div style="display:flex;align-items:center;gap:12px;">
+    <div style="width:180px;height:34px;background:var(--surface-inverted);display:flex;align-items:center;justify-content:center;"><span style="font-family:var(--font-display);font-size:20px;color:var(--text-on-inverted);">LOCKED.</span></div>
+    <span class="kk">--dur-flash 750MS HOLD · CHECK-IN CONFIRMATION</span>
+  </div>
+  <span class="kk">WHILE DRAGGING: NO TRANSITION AT ALL · SCREEN CHANGES: NO TRANSITION AT ALL</span>
+</div>
+</div></body></html>

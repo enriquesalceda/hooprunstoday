@@ -1,0 +1,50 @@
+<!-- @dsCard group="Components" viewport="700x400" name="Court" subtitle="Court row, on-court banner, bulletin, slide-to-engage" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Court</title>
+<link rel="stylesheet" href="../../styles.css">
+<script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script src="../../_ds_bundle.js"></script>
+<style>
+  html, body { margin: 0; background: var(--surface-app); color: var(--text-primary); font-family: var(--font-mono); }
+  #root { padding: 18px 20px; }
+  .lbl { font-family: var(--font-mono); font-weight: 500; font-size: var(--mono-2); color: var(--text-faint); letter-spacing: var(--track-label); }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+function ns(name) {
+  for (const k of Object.keys(window)) {
+    if (k === 'React' || k === 'ReactDOM' || k === 'Babel') continue;
+    try { const v = window[k]; if (v && typeof v === 'object' && typeof v[name] === 'function') return v; } catch (e) {}
+  }
+  return {};
+}
+
+const { CourtRow, BulletinRow, SlideToEngage } = ns('CourtRow');
+
+function Demo() {
+  const [engaged, setEngaged] = React.useState(false);
+  return (
+    <div style={{ display: 'grid', gap: 16 }}>
+      <div style={{ borderTop: 'var(--border-hairline)', margin: '0 -20px' }}>
+        <CourtRow name="PRINCE ALFRED PARK" distanceKm="0.4" onCourtCount={15} nextRun="3V3 HALFCOURT" live youAreHere subdomain="prince-alfred-park.hoopruns.today" />
+        <CourtRow name="REDFERN COMMUNITY CT" distanceKm="2.1" onCourtCount={0} nextRun="OPEN RUN 18:00" />
+      </div>
+      <div style={{ margin: '0 -20px', borderTop: 'var(--border-hairline)' }}>
+        <BulletinRow handle="@jordan_buckets" when="4M AGO" court="PRINCE ALFRED" text="Squads forming on West Hoop. Need one to hold court." />
+      </div>
+      <SlideToEngage width="100%" onEngage={() => setEngaged(true)} />
+      <span className="lbl">{engaged ? 'ENGAGED · FOLLOW WITH LOCKFLASH FOR 750MS' : 'DRAG THE HANDLE PAST 97% TO ENGAGE'}</span>
+    </div>
+  );
+}
+ReactDOM.createRoot(document.getElementById('root')).render(<Demo />);
+</script>
+</body>
+</html>

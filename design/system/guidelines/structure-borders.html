@@ -1,0 +1,22 @@
+<!-- @dsCard group="Spacing" viewport="700x180" name="Borders + radii" subtitle="Square, 1px, no shadows — one 50% exception" -->
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><link rel="stylesheet" href="../styles.css">
+<style>
+  html,body{margin:0;background:var(--surface-app);font-family:var(--font-mono);font-weight:500;font-size:var(--mono-2);}
+  .wrap{padding:18px 20px;}
+  .row{display:flex;gap:12px;}
+  .col{display:flex;flex-direction:column;}
+  .k{font-size:var(--mono-2);color:var(--text-faint);white-space:nowrap;}
+  .kk{font-size:var(--mono-1);color:var(--text-faint);white-space:nowrap;}
+  .v{font-size:var(--mono-2);color:var(--text-secondary);white-space:nowrap;}
+  
+</style></head><body><div class="wrap">
+<div class="row" style="gap:14px;align-items:stretch;">
+  <div class="col" style="flex:1;gap:6px;"><div style="height:52px;border:var(--border-hairline);"></div><span class="kk">--border-hairline · FRAMES</span></div>
+  <div class="col" style="flex:1;gap:6px;"><div style="height:52px;border:var(--border-interactive);"></div><span class="kk">--border-interactive · CONTROLS</span></div>
+  <div class="col" style="flex:1;gap:6px;"><div style="height:52px;border:var(--border-chip);"></div><span class="kk">--border-chip · BADGES</span></div>
+  <div class="col" style="flex:1;gap:6px;"><div style="height:52px;border:var(--border-pending);"></div><span class="kk">--border-pending · UNVERIFIED</span></div>
+  <div class="col" style="flex:1;gap:6px;align-items:center;justify-content:flex-start;"><div style="height:52px;display:flex;align-items:center;"><span style="display:inline-block;width:var(--dot-size);height:var(--dot-size);background:var(--paper-000);border-radius:var(--radius-dot);"></span></div><span class="kk">--radius-dot 50% · THE ONLY CURVE</span></div>
+</div>
+<span class="kk" style="display:block;padding-top:14px;">--radius-none 0 EVERYWHERE ELSE · --shadow-none · NO ELEVATION, NO BLUR, NO GRADIENT</span>
+</div></body></html>

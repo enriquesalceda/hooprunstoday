@@ -1,0 +1,51 @@
+<!-- @dsCard group="Components" viewport="700x300" name="Forms" subtitle="Score inputs, field row, validation hint" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Forms</title>
+<link rel="stylesheet" href="../../styles.css">
+<script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script src="../../_ds_bundle.js"></script>
+<style>
+  html, body { margin: 0; background: var(--surface-app); color: var(--text-primary); font-family: var(--font-mono); }
+  #root { padding: 18px 20px; }
+  .lbl { font-family: var(--font-mono); font-weight: 500; font-size: var(--mono-2); color: var(--text-faint); letter-spacing: var(--track-label); }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+function ns(name) {
+  for (const k of Object.keys(window)) {
+    if (k === 'React' || k === 'ReactDOM' || k === 'Babel') continue;
+    try { const v = window[k]; if (v && typeof v === 'object' && typeof v[name] === 'function') return v; } catch (e) {}
+  }
+  return {};
+}
+
+const { ScoreInput, FieldRow, Button } = ns('ScoreInput');
+
+function Demo() {
+  const [a, setA] = React.useState('21');
+  const [b, setB] = React.useState('');
+  const [h, setH] = React.useState('');
+  const ready = a !== '' && b !== '' && h.trim().length > 1;
+  return (
+    <div style={{ display: 'grid', gap: 12 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+        <ScoreInput label="TEAM A (YOUR SQUAD)" value={a} onChange={setA} />
+        <ScoreInput label="TEAM B (OPPONENTS)" value={b} onChange={setB} />
+      </div>
+      <FieldRow label="OPP CAPTAIN" placeholder="@handle" value={h} onChange={setH} />
+      <span className="lbl">{ready ? `READY · WRITES PENDING TX · PINGS ${h[0] === '@' ? h : '@' + h}` : 'ENTER BOTH SCORES + OPPOSING CAPTAIN HANDLE'}</span>
+      {Button && <Button disabled={!ready}>TRANSMIT SCORE DATA</Button>}
+    </div>
+  );
+}
+ReactDOM.createRoot(document.getElementById('root')).render(<Demo />);
+</script>
+</body>
+</html>

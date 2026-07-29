@@ -1,0 +1,26 @@
+<!-- @dsCard group="Colors" viewport="700x200" name="State" subtitle="Selection is inversion — the one pattern behind every control" -->
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><link rel="stylesheet" href="../styles.css">
+<style>
+  html,body{margin:0;background:var(--surface-app);font-family:var(--font-mono);font-weight:500;font-size:var(--mono-2);}
+  .wrap{padding:18px 20px;}
+  .row{display:flex;gap:12px;}
+  .col{display:flex;flex-direction:column;}
+  .k{font-size:var(--mono-2);color:var(--text-faint);white-space:nowrap;}
+  .kk{font-size:var(--mono-1);color:var(--text-faint);white-space:nowrap;}
+  .v{font-size:var(--mono-2);color:var(--text-secondary);white-space:nowrap;}
+  
+</style></head><body><div class="wrap">
+<div class="col" style="gap:14px;">
+  <div style="display:flex;border:var(--border-interactive);">
+    <div style="flex:1;text-align:center;padding:13px 0;font-weight:700;font-size:var(--mono-4);letter-spacing:var(--track-nav);background:var(--selected-bg);color:var(--selected-ink);">SELECTED</div>
+    <div style="flex:1;text-align:center;padding:13px 0;font-weight:700;font-size:var(--mono-4);letter-spacing:var(--track-nav);border-left:var(--border-interactive);background:var(--unselected-bg);color:var(--unselected-ink);">UNSELECTED</div>
+    <div style="flex:1;text-align:center;padding:13px 0;font-weight:700;font-size:var(--mono-4);letter-spacing:var(--track-nav);border-left:var(--border-interactive);background:var(--hover-bg);color:var(--hover-ink);">HOVER / PRESSED</div>
+  </div>
+  <div class="row" style="gap:14px;">
+    <div style="flex:1;padding:12px;border:var(--border-pending);color:var(--pending-ink);font-weight:700;font-size:var(--mono-5);">PENDING · DASHED #6F6F6A</div>
+    <div style="flex:1;padding:12px;border:var(--border-inverted);color:var(--disabled-ink);opacity:var(--disabled-opacity);font-weight:700;font-size:var(--mono-5);text-align:center;">DISABLED · OPACITY 0.55</div>
+  </div>
+  <span class="kk">NO ACCENT COLOR EXISTS · STATE IS CARRIED BY FILL, BORDER STYLE, AND OPACITY ONLY</span>
+</div>
+</div></body></html>

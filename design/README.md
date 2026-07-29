@@ -9,6 +9,8 @@ Hoopruns.today is a street-basketball app: find live runs on nearby courts (Rada
 ## Fidelity
 **High-fidelity.** Colors, typography, spacing, and interactions are final intent. Recreate pixel-perfectly. Targets: mobile 390×844 (iPhone-class); desktop web 1280×820 reference viewport.
 
+**Start here:** `system/readme.md` for the rules, `system/tokens/` for the values, `prototypes/` for the behavior. The token names below match the CSS custom properties in `system/tokens/`.
+
 ## Design Tokens
 
 Colors (dark UI, monochrome — no accent colors anywhere):
@@ -106,7 +108,8 @@ Backend implications: geofence proximity check for check-in; check-in pins playe
 - `prototypes/hoopruns-core-loop.html` — self-contained interactive mobile prototype (open in browser; all 4 screens + side legend).
 - `prototypes/hoopruns-web-app.html` — self-contained desktop web prototype: same 4 workflows, same logic/tokens, adapted to a 1280×820 browser viewport. Layout deltas: top bar replaces bottom nav (logo left, 3-segment nav center, telemetry right, 58px tall); Radar is two-column (court directory flex + 400px bulletin rail, 1px divider); Check-in is a centered slate (court name Anton 96px, 640px slider); Profile is a 360px portrait/ID column + detail column grid; Log Game is a centered 680px form. Hover states (row bg #1a1a19, nav/tab text → white) replace mobile pressed states.
 - `brand/hoopruns-brand-sheet.html` — self-contained brand sheet: logo construction, lockups, color/type rules, usage do/don'ts. The visual identity reference for all surfaces.
+- `system/` — the full design system: `styles.css` + `tokens/` (colors, type, spacing, borders, motion as CSS custom properties), 19 React components in `components/` (each with a `.d.ts` and a `.prompt.md` usage rule), foundation specimen cards in `guidelines/`, and React UI kits for both products in `ui_kits/`. `system/readme.md` is the written system — content voice, visual foundations, iconography position. `system/SKILL.md` makes the folder loadable as an Agent Skill so Claude Code can design new screens on-brand.
 - `assets/` — brand asset pack.
 - This README.
 
-Suggested repo placement: commit this folder as `design/` at the repo root.
+Suggested repo placement: commit this folder as `design/` at the repo root. Keep the folder intact — `system/` resolves images out of the sibling `assets/` folder.

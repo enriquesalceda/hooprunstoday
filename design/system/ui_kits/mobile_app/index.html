@@ -1,0 +1,32 @@
+<!-- @dsCard group="Mobile app" viewport="390x844" name="Core loop" subtitle="Radar → check-in → profile → log game, click-through" -->
+<!-- @startingPoint section="Screens" subtitle="Mobile core loop, 390×844" viewport="390x844" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Hoopruns — mobile app</title>
+<link rel="stylesheet" href="../../styles.css">
+<script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script src="../../_ds_bundle.js"></script>
+<style>
+  html, body { margin: 0; background: var(--surface-app); }
+  #root { width: 390px; height: 844px; margin: 0 auto; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+function ns(name) {
+  for (const k of Object.keys(window)) {
+    if (k === 'React' || k === 'ReactDOM' || k === 'Babel') continue;
+    try { const v = window[k]; if (v && typeof v === 'object' && typeof v[name] === 'function') return v; } catch (e) {}
+  }
+  return {};
+}
+const { MobileApp } = ns('MobileApp');
+ReactDOM.createRoot(document.getElementById('root')).render(<MobileApp />);
+</script>
+</body>
+</html>
