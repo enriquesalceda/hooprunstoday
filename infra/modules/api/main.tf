@@ -36,6 +36,10 @@ resource "google_cloud_run_v2_service" "this" {
   location = var.region
   ingress  = "INGRESS_TRAFFIC_ALL"
 
+  # Terraform (via CI) must be free to replace the service; the provider
+  # defaults this to true and blocks any destroy.
+  deletion_protection = false
+
   template {
     service_account = google_service_account.runtime.email
 
