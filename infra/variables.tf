@@ -60,3 +60,10 @@ variable "github_repository" {
   type        = string
   default     = "enriquesalceda/hooprunstoday"
 }
+
+variable "clerk_issuer" {
+  description = "Clerk instance issuer URL (public). One dev instance for all environments until the custom-domain prod instance exists."
+  type        = string
+  # Placeholder until the Clerk instance issuer is known (see backend/CLAUDE.md).
+  default = "https://replace-with-your-instance.clerk.accounts.dev"
+}

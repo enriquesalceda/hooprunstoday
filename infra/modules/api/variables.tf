@@ -30,3 +30,8 @@ variable "database_url" {
   type      = string
   sensitive = true
 }
+
+variable "clerk_issuer" {
+  description = "Clerk instance issuer URL (public) — JWT verification"
+  type        = string
+}

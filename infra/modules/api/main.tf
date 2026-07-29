@@ -57,6 +57,11 @@ resource "google_cloud_run_v2_service" "this" {
       }
 
       env {
+        name  = "CLERK_ISSUER"
+        value = var.clerk_issuer
+      }
+
+      env {
         name = "DATABASE_URL"
         value_source {
           secret_key_ref {

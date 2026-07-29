@@ -212,6 +212,24 @@ func (s *spyRunStore) Save(_ context.Context, r domain.Run) error {
   body or any externally-sourced text must be capped to a sane length so a
   pathological payload can't flood the logs.
 
+## API Design
+
+- **One API for all clients.** Web and mobile consume the same endpoints —
+  never namespace by platform (`/web/...`, `/mobile/...`). If clients need
+  different shapes, that's a use-case difference, not a platform one.
+- **Versioned, resource-oriented paths:** `/api/v1/<resource>` (plural
+  nouns): `POST /api/v1/players`, `GET /api/v1/health`.
+- **One error envelope everywhere** (see `adapter/http/respond.go`):
+  `{"error": {"code", "message", "fields?"}}` — machine-readable snake_case
+  `code`, human `message`, optional per-field details on validation errors.
+  Codes in use: `malformed_json` 400, `unauthorized` 401, `handle_taken` /
+  `player_exists` 409, `validation_failed` 422, `internal` 500.
+- **Identity comes from the verified Clerk JWT** (`RequireAuth` middleware,
+  `IdentityFrom(ctx)`), never from request bodies.
+- **No CORS by design.** The web app calls the API from Next.js server
+  actions; mobile calls it natively. Adding CORS headers is a smell that a
+  browser is calling the API directly — route through the web server instead.
+
 ## Database Migrations
 
 - **goose** with plain SQL files in

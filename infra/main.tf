@@ -22,6 +22,7 @@ module "api" {
   project_id    = var.gcp_project_id
   region        = var.gcp_region
   image_tag     = var.image_tag
+  clerk_issuer  = var.clerk_issuer
   min_instances = var.api_min_instances
   max_instances = var.api_max_instances
   database_url  = module.db.connection_uri
