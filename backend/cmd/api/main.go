@@ -19,6 +19,7 @@ import (
 	"github.com/enriquesalceda/hooprunstoday/backend/internal/infrastructure/config"
 	"github.com/enriquesalceda/hooprunstoday/backend/internal/usecase/checkhandle"
 	"github.com/enriquesalceda/hooprunstoday/backend/internal/usecase/createplayer"
+	"github.com/enriquesalceda/hooprunstoday/backend/internal/usecase/getplayer"
 	"github.com/enriquesalceda/hooprunstoday/backend/internal/usecase/listcourts"
 )
 
@@ -59,6 +60,9 @@ func main() {
 	mux.Handle("GET /api/v1/handles/{handle}",
 		adapterhttp.RequireAuth(verifier,
 			adapterhttp.NewCheckHandleHandler(checkhandle.New(players), logger)))
+	mux.Handle("GET /api/v1/players/me",
+		adapterhttp.RequireAuth(verifier,
+			adapterhttp.NewGetMeHandler(getplayer.New(players), logger)))
 
 	server := &http.Server{
 		Addr:              ":" + cfg.Port,

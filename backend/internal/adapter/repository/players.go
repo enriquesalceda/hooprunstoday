@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"strings"
 
 	"github.com/jackc/pgx/v5/pgconn"
 
@@ -40,6 +41,49 @@ func (r *Players) Save(ctx context.Context, p domain.Player) (domain.Player, err
 
 	if err := row.Scan(&p.ID, &p.CreatedAt, &p.UpdatedAt); err != nil {
 		return domain.Player{}, mapSaveError(err)
+	}
+	return p, nil
+}
+
+func (r *Players) FindByClerkUserID(ctx context.Context, clerkUserID string) (domain.Player, error) {
+	var (
+		p         domain.Player
+		dob       sql.NullTime
+		heightVal sql.NullString
+		heightU   sql.NullString
+		positions sql.NullString
+		courtID   sql.NullString
+	)
+	// database/sql cannot scan text[]; flatten with a separator that can
+	// never appear in a position name.
+	err := r.db.QueryRowContext(ctx,
+		`SELECT id, clerk_user_id, real_name, handle, date_of_birth,
+		        height_value, height_unit, array_to_string(positions, '|'), home_court_id,
+		        created_at, updated_at
+		 FROM players WHERE clerk_user_id = $1`, clerkUserID).
+		Scan(&p.ID, &p.ClerkUserID, &p.RealName, &p.Handle, &dob,
+			&heightVal, &heightU, &positions, &courtID, &p.CreatedAt, &p.UpdatedAt)
+	if errors.Is(err, sql.ErrNoRows) {
+		return domain.Player{}, domain.ErrPlayerNotFound
+	}
+	if err != nil {
+		return domain.Player{}, fmt.Errorf("finding player: %w", err)
+	}
+
+	// Identity columns are nullable for rows created before migration 00003.
+	if dob.Valid {
+		p.DateOfBirth = dob.Time
+	}
+	if heightVal.Valid {
+		p.Height = domain.Height{Value: heightVal.String, Unit: domain.HeightUnit(heightU.String)}
+	}
+	if positions.Valid && positions.String != "" {
+		for _, pos := range strings.Split(positions.String, "|") {
+			p.Positions = append(p.Positions, domain.Position(pos))
+		}
+	}
+	if courtID.Valid {
+		p.HomeCourtID = courtID.String
 	}
 	return p, nil
 }

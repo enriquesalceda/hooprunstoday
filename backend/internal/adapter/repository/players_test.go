@@ -88,6 +88,56 @@ func TestPlayers(t *testing.T) {
 		require.ErrorIs(t, err, domain.ErrCourtNotFound)
 	})
 
+	t.Run("finds a player by clerk user id", func(t *testing.T) {
+		// Setup
+		db := openMigratedDB(t)
+		players := repository.NewPlayers(db)
+		saved, err := players.Save(context.Background(), mustNewPlayer(t, db, "user_find", "jordan_miller"))
+		require.NoError(t, err)
+
+		// Exercise
+		found, err := players.FindByClerkUserID(context.Background(), "user_find")
+
+		// Expectations
+		require.NoError(t, err)
+		require.Equal(t, saved.ID, found.ID)
+		require.Equal(t, "jordan_miller", found.Handle)
+		require.Equal(t, saved.Positions, found.Positions)
+		require.Equal(t, saved.HomeCourtID, found.HomeCourtID)
+	})
+
+	t.Run("reports not-found for an unknown clerk user", func(t *testing.T) {
+		// Setup
+		db := openMigratedDB(t)
+		players := repository.NewPlayers(db)
+
+		// Exercise
+		_, err := players.FindByClerkUserID(context.Background(), "user_ghost")
+
+		// Expectations
+		require.ErrorIs(t, err, domain.ErrPlayerNotFound)
+	})
+
+	t.Run("tolerates rows created before the identity migration", func(t *testing.T) {
+		// Setup: a minimal pre-00003 row with NULL identity columns
+		db := openMigratedDB(t)
+		players := repository.NewPlayers(db)
+		_, err := db.Exec(
+			`INSERT INTO players (clerk_user_id, real_name, handle) VALUES ($1, $2, $3)`,
+			"user_legacy", "Old Timer", "old_timer")
+		require.NoError(t, err)
+
+		// Exercise
+		found, err := players.FindByClerkUserID(context.Background(), "user_legacy")
+
+		// Expectations
+		require.NoError(t, err)
+		require.Equal(t, "old_timer", found.Handle)
+		require.True(t, found.DateOfBirth.IsZero())
+		require.Empty(t, found.Positions)
+		require.Empty(t, found.HomeCourtID)
+	})
+
 	t.Run("reports handle availability case-insensitively", func(t *testing.T) {
 		// Setup
 		db := openMigratedDB(t)

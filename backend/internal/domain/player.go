@@ -16,10 +16,11 @@ var (
 	ErrInvalidPositions   = errors.New("positions must be one or more distinct court positions")
 	ErrInvalidHomeCourt   = errors.New("home court is required")
 
-	// Conflicts surfaced by storage.
-	ErrHandleTaken   = errors.New("handle is already taken")
-	ErrPlayerExists  = errors.New("player already exists for this clerk user")
-	ErrCourtNotFound = errors.New("home court does not exist")
+	// Conflicts and absences surfaced by storage.
+	ErrHandleTaken    = errors.New("handle is already taken")
+	ErrPlayerExists   = errors.New("player already exists for this clerk user")
+	ErrCourtNotFound  = errors.New("home court does not exist")
+	ErrPlayerNotFound = errors.New("no player record for this clerk user")
 )
 
 var handlePattern = regexp.MustCompile(`^[a-z0-9_]{3,20}$`)
