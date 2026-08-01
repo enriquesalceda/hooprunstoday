@@ -45,6 +45,19 @@ func TestMigrate(t *testing.T) {
 			`SELECT udt_name FROM information_schema.columns
 			 WHERE table_name = 'players' AND column_name = 'handle'`).Scan(&handleType))
 		require.Equal(t, "citext", handleType, "handle must be case-insensitive")
+
+		var identityColumns int
+		require.NoError(t, db.QueryRowContext(ctx,
+			`SELECT count(*) FROM information_schema.columns
+			 WHERE table_name = 'players'
+			   AND column_name IN ('date_of_birth', 'height_value', 'height_unit', 'positions', 'home_court_id')`).
+			Scan(&identityColumns))
+		require.Equal(t, 5, identityColumns, "players carries the full identity fields")
+
+		var seededCourts int
+		require.NoError(t, db.QueryRowContext(ctx,
+			`SELECT count(*) FROM courts`).Scan(&seededCourts))
+		require.GreaterOrEqual(t, seededCourts, 3, "courts directory is seeded")
 	})
 }
 
@@ -62,7 +75,7 @@ func openTestDB(t *testing.T) *sql.DB {
 
 	// Cleanup
 	t.Cleanup(func() {
-		_, err := db.Exec(`DROP TABLE IF EXISTS players; DROP TABLE IF EXISTS goose_db_version; DROP EXTENSION IF EXISTS citext`)
+		_, err := db.Exec(`DROP TABLE IF EXISTS players; DROP TABLE IF EXISTS courts; DROP TABLE IF EXISTS goose_db_version; DROP EXTENSION IF EXISTS citext`)
 		require.NoError(t, err)
 		require.NoError(t, db.Close())
 	})
