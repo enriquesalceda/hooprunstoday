@@ -112,6 +112,9 @@ export function JoinFlow() {
       mode === "signUp" ? await signUp.finalize() : await signIn.finalize();
     setVerifying(false);
     if (finalizeError) {
+      // Config problem (e.g. the instance requiring fields this flow doesn't
+      // collect), not a wrong code — surface the real cause to developers.
+      console.error("sign-up could not finalize:", finalizeError.code, finalizeError.message);
       setCodeError(true);
       setCode("");
       return;
