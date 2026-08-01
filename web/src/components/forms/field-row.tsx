@@ -1,6 +1,6 @@
 "use client";
 
-import type { CSSProperties } from "react";
+import type { CSSProperties, ReactNode } from "react";
 
 type Props = {
   label: string;
@@ -10,13 +10,29 @@ type Props = {
   autoComplete?: string;
   required?: boolean;
   uppercase?: boolean; // display-only; the submitted value keeps its typed case
+  value?: string;
+  onChange?: (value: string) => void;
+  trailing?: ReactNode; // e.g. a UnitToggle, flush inside the frame
   style?: CSSProperties;
 };
 
 /* The system's only free-text input: label cell inside the 1px frame.
-   Uncontrolled — pairs with form actions via name/FormData.
+   Uncontrolled by default (pairs with form actions via name/FormData);
+   pass value/onChange for controlled use.
    Ported from design/system/components/forms/FieldRow.jsx (web metrics). */
-export function FieldRow({ label, id, name, placeholder, autoComplete, required, uppercase, style }: Props) {
+export function FieldRow({
+  label,
+  id,
+  name,
+  placeholder,
+  autoComplete,
+  required,
+  uppercase,
+  value,
+  onChange,
+  trailing,
+  style,
+}: Props) {
   return (
     <div style={{ border: "var(--border-interactive)", display: "flex", alignItems: "stretch", ...style }}>
       <label
@@ -43,6 +59,8 @@ export function FieldRow({ label, id, name, placeholder, autoComplete, required,
         placeholder={placeholder}
         autoComplete={autoComplete}
         required={required}
+        value={value}
+        onChange={onChange ? (e) => onChange(e.target.value) : undefined}
         autoCapitalize="none"
         autoCorrect="off"
         spellCheck={false}
@@ -61,6 +79,7 @@ export function FieldRow({ label, id, name, placeholder, autoComplete, required,
           textTransform: uppercase ? "uppercase" : "none",
         }}
       />
+      {trailing}
     </div>
   );
 }

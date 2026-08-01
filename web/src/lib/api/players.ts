@@ -1,10 +1,18 @@
 // The one place that knows the backend's endpoints and JSON contract.
 
+import { apiUrl } from "@/lib/api/client";
+
+export type Height = { value: string; unit: "FT" | "CM" };
+
 export type Player = {
   id: string;
   clerkUserId: string;
   realName: string;
   handle: string;
+  dateOfBirth: string; // YYYY-MM-DD
+  height: Height;
+  positions: string[];
+  homeCourtId: string;
   createdAt: string;
 };
 
@@ -24,15 +32,11 @@ export type CreatePlayerResult =
 type CreatePlayerInput = {
   realName: string;
   handle: string;
+  dateOfBirth: string; // YYYY-MM-DD
+  height: Height;
+  positions: string[];
+  homeCourtId: string;
 };
-
-function apiUrl(): string {
-  const url = process.env.NEXT_PUBLIC_API_URL;
-  if (!url) {
-    throw new Error("NEXT_PUBLIC_API_URL is not set");
-  }
-  return url;
-}
 
 export async function createPlayer(
   token: string,
@@ -46,7 +50,14 @@ export async function createPlayer(
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ real_name: input.realName, handle: input.handle }),
+      body: JSON.stringify({
+        real_name: input.realName,
+        handle: input.handle,
+        date_of_birth: input.dateOfBirth,
+        height: input.height,
+        positions: input.positions,
+        home_court_id: input.homeCourtId,
+      }),
     });
   } catch {
     return { ok: false, code: "network" };
@@ -58,6 +69,10 @@ export async function createPlayer(
       clerk_user_id: string;
       real_name: string;
       handle: string;
+      date_of_birth: string;
+      height: Height;
+      positions: string[];
+      home_court_id: string;
       created_at: string;
     };
     return {
@@ -67,6 +82,10 @@ export async function createPlayer(
         clerkUserId: body.clerk_user_id,
         realName: body.real_name,
         handle: body.handle,
+        dateOfBirth: body.date_of_birth,
+        height: body.height,
+        positions: body.positions,
+        homeCourtId: body.home_court_id,
         createdAt: body.created_at,
       },
     };

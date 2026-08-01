@@ -17,7 +17,7 @@ export function Button({ children, onClick, disabled = false, type = "button", s
     <button
       type={type}
       onClick={disabled ? undefined : onClick}
-      aria-disabled={disabled}
+      disabled={disabled}
       style={{
         width: "100%",
         height: "var(--button-h-web)",
