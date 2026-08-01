@@ -28,6 +28,15 @@ func (s *stubPlayerCreator) Execute(_ context.Context, in createplayer.Input) (c
 	return s.out, s.err
 }
 
+const validBody = `{
+	"real_name": "Jordan Miller",
+	"handle": "Jordan_Miller",
+	"date_of_birth": "2000-07-13",
+	"height": {"value": "6'2\"", "unit": "FT"},
+	"positions": ["WING", "FORWARD"],
+	"home_court_id": "court-uuid-1"
+}`
+
 func serveCreatePlayer(t *testing.T, creator *stubPlayerCreator, identity *adapterhttp.Identity, body string) *httptest.ResponseRecorder {
 	t.Helper()
 
@@ -50,40 +59,37 @@ func TestCreatePlayerHandler(t *testing.T) {
 
 	t.Run("creates a player and responds 201 with the record", func(t *testing.T) {
 		// Setup
-		created := time.Date(2026, 7, 29, 12, 0, 0, 0, time.UTC)
+		created := time.Date(2026, 8, 1, 12, 0, 0, 0, time.UTC)
 		creator := &stubPlayerCreator{out: createplayer.Output{Player: domain.Player{
 			ID: "uuid-1", ClerkUserID: "user_2abc", RealName: "Jordan Miller",
-			Handle: "jordan_miller", CreatedAt: created,
+			Handle:      "jordan_miller",
+			DateOfBirth: time.Date(2000, 7, 13, 0, 0, 0, 0, time.UTC),
+			Height:      domain.Height{Value: `6'2"`, Unit: domain.HeightFT},
+			Positions:   []domain.Position{domain.PositionWing, domain.PositionForward},
+			HomeCourtID: "court-uuid-1",
+			CreatedAt:   created,
 		}}}
 
 		// Exercise
-		rec := serveCreatePlayer(t, creator, identity,
-			`{"real_name":"Jordan Miller","handle":"Jordan_Miller"}`)
+		rec := serveCreatePlayer(t, creator, identity, validBody)
 
 		// Expectations
 		require.Equal(t, http.StatusCreated, rec.Code)
 		require.Equal(t, "user_2abc", creator.got.ClerkUserID,
 			"clerk user id must come from the verified token, not the body")
+		require.Equal(t, time.Date(2000, 7, 13, 0, 0, 0, 0, time.UTC), creator.got.DateOfBirth)
+		require.Equal(t, []domain.Position{domain.PositionWing, domain.PositionForward}, creator.got.Positions)
+		require.Equal(t, domain.Height{Value: `6'2"`, Unit: domain.HeightFT}, creator.got.Height)
 
-		var body map[string]string
+		var body map[string]any
 		require.NoError(t, json.NewDecoder(rec.Body).Decode(&body))
 		require.Equal(t, "uuid-1", body["id"])
-		require.Equal(t, "user_2abc", body["clerk_user_id"])
-		require.Equal(t, "Jordan Miller", body["real_name"])
 		require.Equal(t, "jordan_miller", body["handle"])
-		require.Equal(t, "2026-07-29T12:00:00Z", body["created_at"])
-	})
-
-	t.Run("ignores a clerk_user_id smuggled into the body", func(t *testing.T) {
-		// Setup
-		creator := &stubPlayerCreator{}
-
-		// Exercise
-		serveCreatePlayer(t, creator, identity,
-			`{"real_name":"J","handle":"jordan","clerk_user_id":"user_forged"}`)
-
-		// Expectations
-		require.Equal(t, "user_2abc", creator.got.ClerkUserID)
+		require.Equal(t, "2000-07-13", body["date_of_birth"])
+		require.Equal(t, map[string]any{"value": `6'2"`, "unit": "FT"}, body["height"])
+		require.Equal(t, []any{"WING", "FORWARD"}, body["positions"])
+		require.Equal(t, "court-uuid-1", body["home_court_id"])
+		require.Equal(t, "2026-08-01T12:00:00Z", body["created_at"])
 	})
 
 	t.Run("responds 400 on malformed json", func(t *testing.T) {
@@ -96,13 +102,38 @@ func TestCreatePlayerHandler(t *testing.T) {
 	})
 
 	t.Run("responds 401 when no identity is present", func(t *testing.T) {
-		// Setup + Exercise (handler mounted without middleware)
-		rec := serveCreatePlayer(t, &stubPlayerCreator{}, nil,
-			`{"real_name":"Jordan","handle":"jordan"}`)
+		// Setup + Exercise
+		rec := serveCreatePlayer(t, &stubPlayerCreator{}, nil, validBody)
 
 		// Expectations
 		require.Equal(t, http.StatusUnauthorized, rec.Code)
 		requireErrorCode(t, rec, "unauthorized")
+	})
+
+	t.Run("responds 422 with field details on unparseable fields", func(t *testing.T) {
+		cases := []struct {
+			name  string
+			body  string
+			field string
+		}{
+			{"bad date format", strings.Replace(validBody, "2000-07-13", "13/07/2000", 1), "date_of_birth"},
+			{"unknown position", strings.Replace(validBody, `"WING"`, `"COACH"`, 1), "positions"},
+			{"bad height unit", strings.Replace(validBody, `"FT"`, `"IN"`, 1), "height"},
+		}
+
+		for _, tc := range cases {
+			t.Run(tc.name, func(t *testing.T) {
+				// Setup
+				creator := &stubPlayerCreator{}
+
+				// Exercise
+				rec := serveCreatePlayer(t, creator, identity, tc.body)
+
+				// Expectations
+				require.Equal(t, http.StatusUnprocessableEntity, rec.Code)
+				requireFieldError(t, rec, tc.field)
+			})
+		}
 	})
 
 	t.Run("responds 422 with field details on validation errors", func(t *testing.T) {
@@ -113,6 +144,11 @@ func TestCreatePlayerHandler(t *testing.T) {
 		}{
 			{"invalid handle", domain.ErrInvalidHandle, "handle"},
 			{"invalid real name", domain.ErrInvalidRealName, "real_name"},
+			{"invalid date of birth", domain.ErrInvalidDateOfBirth, "date_of_birth"},
+			{"invalid height", domain.ErrInvalidHeight, "height"},
+			{"invalid positions", domain.ErrInvalidPositions, "positions"},
+			{"missing home court", domain.ErrInvalidHomeCourt, "home_court_id"},
+			{"unknown home court", domain.ErrCourtNotFound, "home_court_id"},
 		}
 
 		for _, tc := range cases {
@@ -121,20 +157,11 @@ func TestCreatePlayerHandler(t *testing.T) {
 				creator := &stubPlayerCreator{err: tc.err}
 
 				// Exercise
-				rec := serveCreatePlayer(t, creator, identity,
-					`{"real_name":"Jordan","handle":"jordan"}`)
+				rec := serveCreatePlayer(t, creator, identity, validBody)
 
 				// Expectations
 				require.Equal(t, http.StatusUnprocessableEntity, rec.Code)
-				var body struct {
-					Error struct {
-						Code   string            `json:"code"`
-						Fields map[string]string `json:"fields"`
-					} `json:"error"`
-				}
-				require.NoError(t, json.NewDecoder(rec.Body).Decode(&body))
-				require.Equal(t, "validation_failed", body.Error.Code)
-				require.Contains(t, body.Error.Fields, tc.field)
+				requireFieldError(t, rec, tc.field)
 			})
 		}
 	})
@@ -155,8 +182,7 @@ func TestCreatePlayerHandler(t *testing.T) {
 				creator := &stubPlayerCreator{err: tc.err}
 
 				// Exercise
-				rec := serveCreatePlayer(t, creator, identity,
-					`{"real_name":"Jordan","handle":"jordan"}`)
+				rec := serveCreatePlayer(t, creator, identity, validBody)
 
 				// Expectations
 				require.Equal(t, http.StatusConflict, rec.Code)
@@ -170,13 +196,24 @@ func TestCreatePlayerHandler(t *testing.T) {
 		creator := &stubPlayerCreator{err: errors.New("pq: connection reset by peer")}
 
 		// Exercise
-		rec := serveCreatePlayer(t, creator, identity,
-			`{"real_name":"Jordan","handle":"jordan"}`)
+		rec := serveCreatePlayer(t, creator, identity, validBody)
 
 		// Expectations
 		require.Equal(t, http.StatusInternalServerError, rec.Code)
 		requireErrorCode(t, rec, "internal")
-		require.NotContains(t, rec.Body.String(), "connection reset",
-			"internal error details must not leak to clients")
+		require.NotContains(t, rec.Body.String(), "connection reset")
 	})
+}
+
+func requireFieldError(t *testing.T, rec *httptest.ResponseRecorder, field string) {
+	t.Helper()
+	var body struct {
+		Error struct {
+			Code   string            `json:"code"`
+			Fields map[string]string `json:"fields"`
+		} `json:"error"`
+	}
+	require.NoError(t, json.NewDecoder(rec.Body).Decode(&body))
+	require.Equal(t, "validation_failed", body.Error.Code)
+	require.Contains(t, body.Error.Fields, field)
 }

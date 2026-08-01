@@ -17,7 +17,9 @@ import (
 	"github.com/enriquesalceda/hooprunstoday/backend/internal/adapter/repository"
 	"github.com/enriquesalceda/hooprunstoday/backend/internal/infrastructure/clerk"
 	"github.com/enriquesalceda/hooprunstoday/backend/internal/infrastructure/config"
+	"github.com/enriquesalceda/hooprunstoday/backend/internal/usecase/checkhandle"
 	"github.com/enriquesalceda/hooprunstoday/backend/internal/usecase/createplayer"
+	"github.com/enriquesalceda/hooprunstoday/backend/internal/usecase/listcourts"
 )
 
 type realClock struct{}
@@ -45,12 +47,18 @@ func main() {
 
 	verifier := clerk.NewVerifier(cfg.ClerkIssuer, &http.Client{Timeout: 5 * time.Second})
 	players := repository.NewPlayers(db)
-	createPlayer := createplayer.New(players, realClock{})
+	courts := repository.NewCourts(db)
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /api/v1/health", adapterhttp.Health)
 	mux.Handle("POST /api/v1/players",
-		adapterhttp.RequireAuth(verifier, adapterhttp.NewCreatePlayerHandler(createPlayer, logger)))
+		adapterhttp.RequireAuth(verifier,
+			adapterhttp.NewCreatePlayerHandler(createplayer.New(players, realClock{}), logger)))
+	mux.Handle("GET /api/v1/courts",
+		adapterhttp.NewListCourtsHandler(listcourts.New(courts), logger))
+	mux.Handle("GET /api/v1/handles/{handle}",
+		adapterhttp.RequireAuth(verifier,
+			adapterhttp.NewCheckHandleHandler(checkhandle.New(players), logger)))
 
 	server := &http.Server{
 		Addr:              ":" + cfg.Port,
