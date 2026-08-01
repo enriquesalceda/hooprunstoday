@@ -16,7 +16,7 @@ export function Button({ children, onClick, disabled = false, type = "button", s
   return (
     <button
       type={type}
-      onClick={onClick}
+      onClick={disabled ? undefined : onClick}
       aria-disabled={disabled}
       style={{
         width: "100%",

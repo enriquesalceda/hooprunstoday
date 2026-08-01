@@ -1,11 +1,13 @@
-import { SignUp } from "@clerk/nextjs";
+import { auth } from "@clerk/nextjs/server";
+import { redirect } from "next/navigation";
 
-// Plain Clerk-prebuilt flow for now; the design-faithful custom phone-OTP
-// form replaces this once the design package is finished.
-export default function SignUpPage() {
-  return (
-    <main style={{ display: "grid", placeItems: "center", minHeight: "100vh" }}>
-      <SignUp routing="hash" fallbackRedirectUrl="/join/record" />
-    </main>
-  );
+import { JoinFlow } from "@/app/join/_components/join-flow";
+
+export default async function JoinPage() {
+  const { userId } = await auth();
+  if (userId) {
+    redirect("/join/record");
+  }
+
+  return <JoinFlow />;
 }

@@ -11,8 +11,16 @@ export default async function RecordPage() {
   }
 
   return (
-    <main style={{ display: "grid", placeItems: "center", minHeight: "100vh" }}>
-      <RecordForm action={createPlayerRecord} />
+    <main style={{ flex: 1, overflowY: "auto", display: "flex", flexDirection: "column", alignItems: "center" }}>
+      <div
+        style={{
+          width: 640,
+          maxWidth: "100%",
+          padding: "var(--space-12) var(--gutter-web) var(--space-14)",
+        }}
+      >
+        <RecordForm action={createPlayerRecord} />
+      </div>
     </main>
   );
 }
