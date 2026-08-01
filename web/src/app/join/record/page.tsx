@@ -4,11 +4,21 @@ import { redirect } from "next/navigation";
 import { checkHandleAvailability, createPlayerRecord } from "@/app/join/record/actions";
 import { RecordFlow } from "@/app/join/record/record-flow";
 import { getCourts } from "@/lib/api/courts";
+import { getMe } from "@/lib/api/me";
 
 export default async function RecordPage() {
-  const { userId } = await auth();
+  const { userId, getToken } = await auth();
   if (!userId) {
     redirect("/join");
+  }
+
+  // SAME EMAIL, SAME RECORD: returning players skip straight to their profile.
+  const token = await getToken();
+  if (token) {
+    const me = await getMe(token);
+    if (me.ok) {
+      redirect("/you");
+    }
   }
 
   const courtsResult = await getCourts();

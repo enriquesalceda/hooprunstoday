@@ -76,26 +76,6 @@ export function RecordFlow({ courts, action, checkAvailability, debounceMs = 600
     }, debounceMs);
   }
 
-  if (state.status === "created") {
-    return (
-      <section aria-live="polite" style={{ display: "flex", flexDirection: "column", gap: "var(--space-5)" }}>
-        <p style={hintStyle}>RECORD CREATED · {state.createdAt}</p>
-        <h1
-          style={{
-            fontFamily: "var(--font-display)",
-            fontWeight: 400,
-            fontSize: "var(--display-5)",
-            lineHeight: 0.95,
-            color: "var(--text-primary)",
-          }}
-        >
-          @{state.handle}
-        </h1>
-        <p style={hintStyle}>{state.handle}.hoopruns.today</p>
-      </section>
-    );
-  }
-
   const homeCourt = courts.find((c) => c.id === homeCourtId);
 
   if (screen === "courtpick") {

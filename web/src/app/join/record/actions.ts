@@ -1,6 +1,7 @@
 "use server";
 
 import { auth } from "@clerk/nextjs/server";
+import { redirect } from "next/navigation";
 
 import type { RecordFormState } from "@/app/join/record/state";
 import { normalizeHandle, validateHandle, validateRealName } from "@/domain/player";
@@ -77,11 +78,7 @@ export async function createPlayerRecord(
   });
 
   if (result.ok) {
-    return {
-      status: "created",
-      handle: result.player.handle,
-      createdAt: result.player.createdAt,
-    };
+    redirect("/join/geofence");
   }
 
   switch (result.code) {

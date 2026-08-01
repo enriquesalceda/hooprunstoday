@@ -1,4 +1,3 @@
 export type RecordFormState =
   | { status: "idle" }
-  | { status: "error"; message: string; fields?: Record<string, string> }
-  | { status: "created"; handle: string; createdAt: string };
+  | { status: "error"; message: string; fields?: Record<string, string> };

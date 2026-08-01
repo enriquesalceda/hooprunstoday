@@ -138,19 +138,4 @@ describe("RecordFlow", () => {
     expect(action).not.toHaveBeenCalled();
   });
 
-  it("shows the stamp after creation", async () => {
-    const user = userEvent.setup();
-    const action = async (): Promise<RecordFormState> => ({
-      status: "created",
-      handle: "jordan_miller",
-      createdAt: "2026-08-01T12:00:00Z",
-    });
-    renderFlow({ action });
-
-    await fillEverything(user);
-    await user.click(screen.getByRole("button", { name: /create player record/i }));
-
-    expect(await screen.findByText(/record created/i)).toBeInTheDocument();
-    expect(screen.getByText(/@jordan_miller/i)).toBeInTheDocument();
-  });
 });
