@@ -1,0 +1,59 @@
+<!-- @dsCard group="Components" viewport="700x300" name="Empty + facts" subtitle="Dashed empty states, chip variants, fact table" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Empty and facts</title>
+<link rel="stylesheet" href="../../styles.css">
+<script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script src="../../_ds_bundle.js"></script>
+<style>
+  html, body { margin: 0; background: var(--surface-app); color: var(--text-primary); font-family: var(--font-mono); }
+  #root { padding: 18px 20px; }
+  .lbl { font-family: var(--font-mono); font-weight: 500; font-size: var(--mono-2); color: var(--text-faint); letter-spacing: var(--track-label); }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+function ns(name) {
+  for (const k of Object.keys(window)) {
+    if (k === 'React' || k === 'ReactDOM' || k === 'Babel') continue;
+    try { const v = window[k]; if (v && typeof v === 'object' && typeof v[name] === 'function') return v; } catch (e) {}
+  }
+  return {};
+}
+
+const { EmptyState, FactTable } = ns('EmptyState');
+const { Chip } = ns('Chip');
+
+function Demo() {
+  const [picked, setPicked] = React.useState(['WING']);
+  const toggle = (p) => setPicked((c) => (c.indexOf(p) === -1 ? c.concat([p]) : c.filter((x) => x !== p)));
+  return (
+    <div style={{ display: 'grid', gap: 16 }}>
+      <div style={{ display: 'grid', gap: 8 }}>
+        <EmptyState label="NO GAMES LOGGED" meta="LOG A SCORE TO OPEN YOUR RECORD" />
+        <EmptyState label="NO BADGES YET" center />
+      </div>
+      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
+        <Chip variant="pending">UNVOUCHED</Chip>
+        {['POINT GUARD', 'WING', 'CENTER'].map((p) => (
+          <Chip key={p} variant="outline" selected={picked.indexOf(p) !== -1} onClick={() => toggle(p)}>{p}</Chip>
+        ))}
+        <span className="lbl">TAP TO MULTI-SELECT</span>
+      </div>
+      <FactTable rows={[
+        { term: 'COURT CHECK-IN', value: 'REQUIRES PROXIMITY MATCH' },
+        { term: 'BROWSING COURTS', value: 'WORKS WITHOUT LOCATION' },
+        { term: 'BACKGROUND TRACKING', value: 'NEVER' },
+      ]} />
+    </div>
+  );
+}
+ReactDOM.createRoot(document.getElementById('root')).render(<Demo />);
+</script>
+</body>
+</html>

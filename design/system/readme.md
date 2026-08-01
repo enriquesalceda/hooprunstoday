@@ -12,6 +12,10 @@ The identity is deliberately anti-app: black, white, and monospace. It reads lik
 | Web app (browser) | 1280 × 820 | `ui_kits/web_app/` |
 | Brand sheet / print | Letter, paper surface | `guidelines/brand-sheet.md`, `assets/` |
 
+## Authentication
+
+Identity is an **email address plus a Clerk email OTP** — no phone number, no SMS, no password, and no country picker anywhere in the product. One address, one player. The address is never shown on a profile and never appears after the code screen, where it is masked to `j•••••@gmail.com`.
+
 ## Sources
 
 Built from the design artifacts in this project — these are the ground truth:
@@ -47,6 +51,8 @@ The product talks like a court, not like a brand. Terse, present-tense, slightly
 
 **Numbers are naked.** `0.4 KM`, `14 ON COURT`, `24.5` PPG, `875` street score. No "approximately", no rounding language, no units spelled out in words.
 
+**Deadlines are stated, not implied.** Where silence decides something, the countdown is on the row: `AUTO-VERIFIES IN 41:12`, `CLOSES IN 1H 30M`, `RESEND CODE IN 0:28`. Never "soon", never a relative promise the app can't keep.
+
 **No emoji, ever.** Two unicode glyphs are sanctioned as functional marks: `●` (live) and `▶` (you-are-here), plus `→` and `←` for the slider handle and back links. Nothing else.
 
 ## VISUAL FOUNDATIONS
@@ -55,9 +61,15 @@ The product talks like a court, not like a brand. Terse, present-tense, slightly
 
 **Type.** Anton (400, caps) for anything you'd shout — court names, scores, player names, screen titles. Monospace 500/700 for everything you'd read off an instrument — labels, metadata, buttons, handles. No third family in the product; Helvetica Bold appears only inside the `.TODAY` bar of the logo. Display line-heights are crushed (0.8–0.95) so stacked headlines read as one solid block; mono tracking widens with importance (0.06em labels → 0.14em primary action).
 
+**Split slates (web).** A big Anton statement on the left, the interaction in a right panel behind a hairline. The constraint that makes it survive narrow frames: the left panel is `flex: 1; min-width: min-content` — it can never shrink below its headline, because 96–140px display type has no smaller form and `overflow: visible` would spill it across the hairline. The right panel is `flex: 0 1 520px; min-width: 0; box-sizing: border-box` and absorbs the squeeze, because a field and a button genuinely can get narrower. Never `overflow: hidden` on the left panel — it clips letterforms.
+
 **Layout.** Full-bleed rows separated by 1px hairlines — no floating cards, no gutters between siblings, no elevation. 16px screen gutter on mobile, 24px on web. Content is either flush to the edge (rows, banners, sliders, nav) or inset by exactly the gutter. Web adds columns: Radar splits into a flexible directory + a fixed 400px bulletin rail; Profile is a fixed 360px portrait column + detail column; forms are centered at 680px. Primary actions and the slider are pinned to the bottom of their screen.
 
 **Backgrounds.** Flat color only. No gradients, no photographic backdrops, no repeating pattern, no texture, no noise. Empty space is empty.
+
+**Obligation frames.** A **solid white** 1px frame means *this needs you* — it is used for nothing else, and there is at most a couple on a screen (`ClaimCard`). A **dashed `#6f6f6a`** frame means *waiting on someone else, or not there yet* — pending claims, open votes, unverified scores, empty sections. Learn that pair and the whole product sorts itself at a glance.
+
+**Empty states.** An empty section is a dashed `#6f6f6a` frame stating what is absent and what fills it — `NO GAMES LOGGED · LOG A SCORE TO OPEN YOUR RECORD`. Never hide the section, never draw an illustration, never use color. It is the same dashed treatment an unverified score gets, because "not yet" and "not confirmed" are the same idea here.
 
 **Cards.** There are no cards. What looks like a card is a 1px `#2a2a28` frame around a content block, or a hairline-separated row. No radius, no shadow, no background shift.
 
@@ -103,8 +115,10 @@ The pulsing status dot is a 6px `border-radius: 50%` div, not a glyph. The only 
 - `styles.css` — the single entry point consumers link. `@import`s everything below.
 - `tokens/` — `fonts.css`, `colors.css`, `typography.css`, `spacing.css`, `borders.css`, `motion.css`
 - `components/` — `brand/`, `core/`, `navigation/`, `court/`, `data/`, `forms/`
-- `ui_kits/mobile_app/` — Radar, Check-in, Profile, Log Game (390 × 844, click-through)
-- `ui_kits/web_app/` — the same four workflows at 1280 × 820
+- `ui_kits/mobile_app/` — `index.html`: Radar, Check-in, Profile, Log Game · `signup.html`: the 6-step sign-up flow · `verify.html`: the 7-step score-verification flow (390 × 844, click-through)
+- `ui_kits/web_app/` — the same three flows at 1280 × 820
+- `ui_kits/signupData.jsx` — positions, rosters, and the `useSignupForm()` state machine both sign-up kits share
+- `ui_kits/verifyData.jsx` — claim/vote/inbox seed data and `useVerifyQueue()`, shared by both verification kits
 - `guidelines/` — foundation specimen cards + brand-sheet prose
 - `assets/` — wordmarks (PNG + SVG), app icons, favicons, webmanifest, `README.txt` usage rules
 - `SKILL.md` — makes this folder usable as an Agent Skill in Claude Code
@@ -117,10 +131,12 @@ The pulsing status dot is a 6px `border-radius: 50%` div, not a glyph. The only 
 | `core/` | `Button`, `Chip`, `SectionLabel`, `StatusDot`, `Telemetry` |
 | `navigation/` | `SegmentedControl`, `AppHeader`, `BottomNav`, `BackLink` |
 | `court/` | `CourtRow`, `OnCourtBanner`, `BulletinRow`, `SlideToEngage`, `LockFlash` |
-| `data/` | `StatGrid`, `ScoreBlock`, `GameLogRow`, `RosterRow` |
-| `forms/` | `ScoreInput`, `FieldRow` |
+| `data/` | `StatGrid`, `ScoreBlock`, `GameLogRow`, `RosterRow`, `EmptyState`, `FactTable`, `ClaimCard`, `VoteSide`, `InboxRow` |
+| `forms/` | `ScoreInput`, `FieldRow`, `UnitToggle`, `EmailField`, `PickerList`, `CodeInput`, `DateField`, `PickerRow` |
 
-Every component in this list has a counterpart in the mobile or web prototype. **Intentional additions:** `LockFlash` and `Telemetry` were extracted as named components because both products render them identically — in the prototypes they were inline markup, not separate parts.
+Every component in this list has a counterpart in the mobile or web prototype. **Intentional additions:** `LockFlash` and `Telemetry` were extracted as named components because both products render them identically — in the prototypes they were inline markup, not separate parts. Same for the sign-up set (`EmailField`, `PickerList`, `CodeInput`, `DateField`, `PickerRow`, `UnitToggle`, `EmptyState`, `FactTable`), lifted out of the sign-up prototypes once both platforms proved they render identically.
+
+**Extended rather than duplicated:** `Chip` gained a `selected` flag (multi-select positions and vouch capabilities) and a `pending` variant (the dashed `UNVOUCHED` mark); `FieldRow` gained a `trailing` slot so a `UnitToggle` can sit inside its frame; `GameLogRow` gained `sublabel` so it doubles as a two-line queue row; `RosterRow` gained `muted` for court-vote voter rolls. Reach for an existing component's new prop before adding a component.
 
 ### Fonts
 

@@ -1,0 +1,69 @@
+<!-- @dsCard group="Components" viewport="700x420" name="Sign-up forms" subtitle="Email, code cells, date, pickers" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Sign-up forms</title>
+<link rel="stylesheet" href="../../styles.css">
+<script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script src="../../_ds_bundle.js"></script>
+<style>
+  html, body { margin: 0; background: var(--surface-app); color: var(--text-primary); font-family: var(--font-mono); }
+  #root { padding: 18px 20px; }
+  .lbl { font-family: var(--font-mono); font-weight: 500; font-size: var(--mono-2); color: var(--text-faint); letter-spacing: var(--track-label); }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+function ns(name) {
+  for (const k of Object.keys(window)) {
+    if (k === 'React' || k === 'ReactDOM' || k === 'Babel') continue;
+    try { const v = window[k]; if (v && typeof v === 'object' && typeof v[name] === 'function') return v; } catch (e) {}
+  }
+  return {};
+}
+
+const { EmailField, maskEmail, PickerList, CodeInput, DateField, PickerRow, UnitToggle, FieldRow } = ns('EmailField');
+
+function Demo() {
+  const [email, setEmail] = React.useState('jordan@court.com');
+  const [code, setCode] = React.useState('4829');
+  const [dob, setDob] = React.useState({ day: '14', month: '03', year: '1998' });
+  const [unit, setUnit] = React.useState('FT');
+  const [h, setH] = React.useState("6'2\"");
+  const [rOpen, setROpen] = React.useState(false);
+  const [rid, setRid] = React.useState(null);
+  const rosters = [
+    { id: 't1', name: 'NEWTOWN OUTLAWS', meta: 'DIV II' },
+    { id: 't2', name: 'WATERLOO WRECKERS', meta: 'DIV III' },
+  ];
+  return (
+    <div style={{ display: 'grid', gap: 14 }}>
+      <EmailField value={email} onChange={setEmail} />
+      <span className="lbl">CODE SCREEN SHOWS {maskEmail ? maskEmail(email) : ''} — NEVER THE FULL ADDRESS</span>
+      <CodeInput value={code} onChange={setCode} />
+      <div style={{ display: 'flex', gap: 20 }}>
+        <span className="lbl">DEFAULT</span>
+        <span className="lbl">↓ ERROR + LOCKED BELOW</span>
+      </div>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+        <CodeInput value="482" state="error" />
+        <CodeInput value="" state="locked" />
+      </div>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+        <DateField day={dob.day} month={dob.month} year={dob.year} onChange={(p, v) => setDob({ ...dob, [p]: v })} />
+        <FieldRow label="HEIGHT" value={h} onChange={setH} trailing={<UnitToggle options={['FT', 'CM']} value={unit} onChange={setUnit} />} />
+      </div>
+      <PickerRow label="HOME COURT" value="PRINCE ALFRED PARK" glyph="→" />
+      <PickerRow label="LEAGUE TEAM" placeholder="OPTIONAL" value={rid ? (rosters.find((r) => r.id === rid) || {}).name : null} glyph={rOpen ? '↑' : '↓'} onClick={() => setROpen(!rOpen)} />
+      {rOpen && <PickerList options={rosters} value={rid} onChange={(id) => { setRid(id === rid ? null : id); setROpen(false); }} maxHeight={120} />}
+    </div>
+  );
+}
+ReactDOM.createRoot(document.getElementById('root')).render(<Demo />);
+</script>
+</body>
+</html>

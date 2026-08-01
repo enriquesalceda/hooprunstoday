@@ -1,0 +1,64 @@
+<!-- @dsCard group="Components" viewport="700x420" name="Verification" subtitle="Claim card, vote sides, voter roll, inbox rows" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Verification</title>
+<link rel="stylesheet" href="../../styles.css">
+<script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script src="../../_ds_bundle.js"></script>
+<style>
+  html, body { margin: 0; background: var(--surface-app); color: var(--text-primary); font-family: var(--font-mono); }
+  #root { padding: 18px 20px; }
+  .lbl { font-family: var(--font-mono); font-weight: 500; font-size: var(--mono-2); color: var(--text-faint); letter-spacing: var(--track-label); }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+function ns(name) {
+  for (const k of Object.keys(window)) {
+    if (k === 'React' || k === 'ReactDOM' || k === 'Babel') continue;
+    try { const v = window[k]; if (v && typeof v === 'object' && typeof v[name] === 'function') return v; } catch (e) {}
+  }
+  return {};
+}
+const { ClaimCard, VoteSide, InboxRow, GameLogRow, RosterRow } = ns('ClaimCard');
+
+function Demo() {
+  const [mine, setMine] = React.useState(null);
+  return (
+    <div style={{ display: 'grid', gap: 16 }}>
+      <ClaimCard by="@jordan_buckets" score="21 - 15" verdict="YOU LOST"
+        meta="18:40 TODAY" onClick={() => {}} />
+      <div style={{ display: 'grid', gap: 10 }}>
+        <VoteSide who="@southside_five CLAIM" score="21 - 19" tally={mine === 'a' ? 4 : 3} selected={mine === 'a'} locked={!!mine} onClick={() => setMine('a')} />
+        <VoteSide who="YOUR CLAIM" score="19 - 21" tally={mine === 'b' ? 3 : 2} selected={mine === 'b'} locked={!!mine} onClick={() => setMine('b')} />
+      </div>
+      <span className="lbl">{mine ? 'YOUR VOTE IS IN · MAJORITY AT CLOSE SETTLES IT' : 'TAP THE SCORE YOU SAW'}</span>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, alignItems: 'start' }}>
+        <div style={{ display: 'grid', gap: 8 }}>
+          <GameLogRow pending label="YOUR VOTE IS NEEDED" sublabel="21 - 19 VS 19 - 21 · CLOSES IN 1H 30M" meta="PRINCE ALFRED" />
+          <GameLogRow label="3V3 · W 21 - 15 VS @southside_five" meta="VERIFIED · JUL 12" />
+        </div>
+        <div>
+          <RosterRow name="@jordan_buckets" meta="VOTED" />
+          <RosterRow name="@a_cross" meta="NOT VOTED" muted />
+          <RosterRow name="@YOU" meta="NOT VOTED" muted />
+        </div>
+      </div>
+      <div>
+        <InboxRow kind="SCORE CLAIM" when="41:12 LEFT" actionable onClick={() => {}}
+          text="@jordan_buckets logged a 3V3 HALFCOURT 21 - 15 against you at Prince Alfred Park." />
+        <InboxRow kind="VOUCH" when="2H AGO"
+          text="@rim_run_kev vouched you for LOCKDOWN. That is 61 vouches." />
+      </div>
+    </div>
+  );
+}
+ReactDOM.createRoot(document.getElementById('root')).render(<Demo />);
+</script>
+</body>
+</html>

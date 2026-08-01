@@ -1,13 +1,14 @@
 import * as React from 'react';
 
-/** Single-line text input with a mono label cell on the left. */
+/** The system's only free-text input. Label sits inside the frame, never above it. */
 export interface FieldRowProps {
-  /** Short caps label: `OPP CAPTAIN`. */
+  /** Short caps label: `OPP CAPTAIN`, `REAL NAME`, `@HANDLE`. */
   label: string;
   value?: string;
   onChange?: (value: string) => void;
-  /** `@handle` for player fields. */
   placeholder?: string;
+  /** Control rendered inside the frame after the input — e.g. a UnitToggle or a glyph cell. */
+  trailing?: React.ReactNode;
   platform?: 'mobile' | 'web';
   style?: React.CSSProperties;
 }

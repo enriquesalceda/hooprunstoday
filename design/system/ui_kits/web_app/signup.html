@@ -1,0 +1,32 @@
+<!-- @dsCard group="Web app" viewport="1280x820" name="Sign-up" subtitle="The same six steps in a desktop viewport" -->
+<!-- @startingPoint section="Screens" subtitle="Web sign-up flow, 1280×820" viewport="1280x820" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Hoopruns — web sign-up</title>
+<link rel="stylesheet" href="../../styles.css">
+<script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script src="../../_ds_bundle.js"></script>
+<style>
+  html, body { margin: 0; background: var(--surface-app); }
+  #root { width: 1280px; height: 820px; margin: 0 auto; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+function ns(name) {
+  for (const k of Object.keys(window)) {
+    if (k === 'React' || k === 'ReactDOM' || k === 'Babel') continue;
+    try { const v = window[k]; if (v && typeof v === 'object' && typeof v[name] === 'function') return v; } catch (e) {}
+  }
+  return {};
+}
+const { WebSignUpFlow } = ns('WebSignUpFlow');
+ReactDOM.createRoot(document.getElementById('root')).render(<WebSignUpFlow />);
+</script>
+</body>
+</html>
