@@ -1,13 +1,13 @@
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 
-import { createPlayerRecord } from "@/app/signup/record/actions";
-import { RecordForm } from "@/app/signup/record/record-form";
+import { createPlayerRecord } from "@/app/join/record/actions";
+import { RecordForm } from "@/app/join/record/record-form";
 
 export default async function RecordPage() {
   const { userId } = await auth();
   if (!userId) {
-    redirect("/signup");
+    redirect("/join");
   }
 
   return (

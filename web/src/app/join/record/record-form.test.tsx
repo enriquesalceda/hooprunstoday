@@ -2,8 +2,8 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";
 
-import { RecordForm } from "@/app/signup/record/record-form";
-import type { RecordFormState } from "@/app/signup/record/state";
+import { RecordForm } from "@/app/join/record/record-form";
+import type { RecordFormState } from "@/app/join/record/state";
 
 function actionReturning(state: RecordFormState) {
   return async () => state;

@@ -2,7 +2,7 @@
 
 import { auth } from "@clerk/nextjs/server";
 
-import type { RecordFormState } from "@/app/signup/record/state";
+import type { RecordFormState } from "@/app/join/record/state";
 import { normalizeHandle, validateHandle, validateRealName } from "@/domain/player";
 import { createPlayer } from "@/lib/api/players";
 

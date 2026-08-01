@@ -2,7 +2,7 @@
 
 import { useActionState } from "react";
 
-import type { RecordFormState } from "@/app/signup/record/state";
+import type { RecordFormState } from "@/app/join/record/state";
 
 type Props = {
   action: (prev: RecordFormState, formData: FormData) => Promise<RecordFormState>;
