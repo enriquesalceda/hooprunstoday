@@ -15,6 +15,9 @@ node_modules/
 *.tfstate.*
 *.tfplan
 
+# Design handoff drop zone (zips are imported then deleted)
+design-handoff/*.zip
+
 # Env / secrets
 .env
 .env.*
