@@ -57,7 +57,7 @@ export async function createPlayerRecord(
   if (heightUnit !== "FT" && heightUnit !== "CM") fields.height = "Pick FT or CM.";
   if (positions.length === 0) fields.positions = "Select at least one position.";
   if (homeCourtId === "") fields.home_court_id = "Pick a home court.";
-  if (Object.keys(fields).length > 0) {
+  if (Object.keys(fields).length > 0 || dobIso === null) {
     return { status: "error", message: "Some fields are invalid.", fields };
   }
 
@@ -71,7 +71,7 @@ export async function createPlayerRecord(
     realName: realName.trim(),
     handle: normalizeHandle(handle),
     dateOfBirth: dobIso,
-    height: { value: heightValue.trim(), unit: heightUnit },
+    height: { value: heightValue.trim(), unit: heightUnit === "CM" ? "CM" : "FT" },
     positions,
     homeCourtId,
   });
