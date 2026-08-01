@@ -45,6 +45,8 @@ resource "vercel_project_environment_variable" "clerk_secret_key" {
   project_id = vercel_project.this.id
   key        = "CLERK_SECRET_KEY"
   value      = var.clerk_secret_key
-  target     = ["production", "preview", "development"]
-  sensitive  = true
+  # Vercel forbids sensitive vars on the development target; local dev uses
+  # web/.env.local anyway.
+  target    = ["production", "preview"]
+  sensitive = true
 }
