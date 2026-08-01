@@ -3,6 +3,7 @@ package createplayer
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/enriquesalceda/hooprunstoday/backend/internal/domain"
 )
@@ -11,6 +12,10 @@ type Input struct {
 	ClerkUserID string
 	RealName    string
 	Handle      string
+	DateOfBirth time.Time
+	Height      domain.Height
+	Positions   []domain.Position
+	HomeCourtID string
 }
 
 type Output struct {
@@ -23,16 +28,29 @@ type PlayerStore interface {
 	Save(ctx context.Context, p domain.Player) (domain.Player, error)
 }
 
-type CreatePlayer struct {
-	store PlayerStore
+type Clock interface {
+	Now() time.Time
 }
 
-func New(store PlayerStore) *CreatePlayer {
-	return &CreatePlayer{store: store}
+type CreatePlayer struct {
+	store PlayerStore
+	clock Clock
+}
+
+func New(store PlayerStore, clock Clock) *CreatePlayer {
+	return &CreatePlayer{store: store, clock: clock}
 }
 
 func (uc *CreatePlayer) Execute(ctx context.Context, in Input) (Output, error) {
-	player, err := domain.NewPlayer(in.ClerkUserID, in.RealName, in.Handle)
+	player, err := domain.NewPlayer(domain.PlayerParams{
+		ClerkUserID: in.ClerkUserID,
+		RealName:    in.RealName,
+		Handle:      in.Handle,
+		DateOfBirth: in.DateOfBirth,
+		Height:      in.Height,
+		Positions:   in.Positions,
+		HomeCourtID: in.HomeCourtID,
+	}, uc.clock.Now())
 	if err != nil {
 		return Output{}, err
 	}

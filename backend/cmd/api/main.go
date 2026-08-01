@@ -20,6 +20,10 @@ import (
 	"github.com/enriquesalceda/hooprunstoday/backend/internal/usecase/createplayer"
 )
 
+type realClock struct{}
+
+func (realClock) Now() time.Time { return time.Now() }
+
 func main() {
 	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
 
@@ -41,7 +45,7 @@ func main() {
 
 	verifier := clerk.NewVerifier(cfg.ClerkIssuer, &http.Client{Timeout: 5 * time.Second})
 	players := repository.NewPlayers(db)
-	createPlayer := createplayer.New(players)
+	createPlayer := createplayer.New(players, realClock{})
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /api/v1/health", adapterhttp.Health)
