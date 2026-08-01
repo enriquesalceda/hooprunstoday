@@ -14,8 +14,12 @@ export type RecordDraft = {
   homeCourtId: string;
 };
 
-/** Converts DD/MM/YYYY parts to ISO YYYY-MM-DD, or null when not a real date. */
-export function dobToIso({ d, m, y }: DobParts): string | null {
+/** Converts DD/MM/YYYY parts to ISO YYYY-MM-DD, or null when not a real
+ *  date. Single-digit day/month are padded — "6 / 5" reads as 06/05. */
+export function dobToIso(parts: DobParts): string | null {
+  const d = parts.d.padStart(2, "0");
+  const m = parts.m.padStart(2, "0");
+  const y = parts.y;
   if (!/^\d{2}$/.test(d) || !/^\d{2}$/.test(m) || !/^\d{4}$/.test(y)) return null;
   const day = Number(d);
   const month = Number(m);

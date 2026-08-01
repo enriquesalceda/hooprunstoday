@@ -17,8 +17,14 @@ describe("dobToIso", () => {
     expect(dobToIso({ d: "29", m: "02", y: "2004" })).toBe("2004-02-29");
   });
 
+  it("pads single-digit days and months", () => {
+    expect(dobToIso({ d: "6", m: "5", y: "1985" })).toBe("1985-05-06");
+    expect(dobToIso({ d: "1", m: "12", y: "2000" })).toBe("2000-12-01");
+  });
+
   it("rejects incomplete or impossible dates", () => {
-    expect(dobToIso({ d: "1", m: "07", y: "2000" })).toBeNull();
+    expect(dobToIso({ d: "", m: "07", y: "2000" })).toBeNull();
+    expect(dobToIso({ d: "13", m: "07", y: "200" })).toBeNull();
     expect(dobToIso({ d: "31", m: "02", y: "2001" })).toBeNull();
     expect(dobToIso({ d: "00", m: "07", y: "2000" })).toBeNull();
     expect(dobToIso({ d: "13", m: "13", y: "2000" })).toBeNull();
