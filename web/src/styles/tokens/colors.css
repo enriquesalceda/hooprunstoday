@@ -1,0 +1,65 @@
+/* Hoopruns.today colors — black, white, and the greys between. No hue anywhere.
+   Two worlds: BLACKTOP (product UI, dark) and PAPER (brand sheets, print, light). */
+:root {
+  /* base — blacktop */
+  --blacktop-900: #0d0d0c; /* app background */
+  --blacktop-800: #141413; /* slider track */
+  --blacktop-700: #1a1a19; /* pressed / hovered row, image well */
+  --blacktop-600: #1f1f1e; /* faint divider */
+  --blacktop-500: #2a2a28; /* hairline: cards, rows, headers */
+  --blacktop-400: #444444; /* interactive frame: tabs, inputs, sliders */
+  --blacktop-300: #555555; /* chip border */
+
+  /* base — paper */
+  --paper-000: #ffffff;
+  --paper-100: #eceae6; /* desk behind a brand sheet */
+  --paper-200: #e4e2dd; /* paper hairline */
+  --ink-900:   #111111; /* brand ink — logo, print */
+
+  /* base — greys */
+  --grey-100: #d9d7d2; /* body copy on dark */
+  --grey-200: #b5b3af; /* secondary metadata */
+  --grey-300: #8a8a85; /* muted / unselected */
+  --grey-400: #6f6f6a; /* faint labels */
+  --grey-500: #6b6b66; /* faint on paper */
+
+  /* semantic — surfaces */
+  --surface-app: var(--blacktop-900);
+  --surface-raised: var(--blacktop-700);
+  --surface-track: var(--blacktop-800);
+  --surface-well: var(--blacktop-700);
+  --surface-inverted: var(--paper-000);
+  --surface-paper: var(--paper-000);
+  --surface-desk: var(--paper-100);
+
+  /* semantic — text */
+  --text-primary: var(--paper-000);
+  --text-body: var(--grey-100);
+  --text-secondary: var(--grey-200);
+  --text-muted: var(--grey-300);
+  --text-faint: var(--grey-400);
+  --text-on-inverted: var(--blacktop-900);
+  --text-on-paper: var(--ink-900);
+  --text-faint-on-paper: var(--grey-500);
+
+  /* semantic — lines */
+  --line-hairline: var(--blacktop-500);
+  --line-faint: var(--blacktop-600);
+  --line-interactive: var(--blacktop-400);
+  --line-chip: var(--blacktop-300);
+  --line-paper: var(--paper-200);
+  --line-paper-strong: var(--ink-900);
+
+  /* semantic — state (the one pattern that drives every selection in the product) */
+  --selected-bg: var(--surface-inverted);
+  --selected-ink: var(--text-on-inverted);
+  --unselected-bg: transparent;
+  --unselected-ink: var(--text-muted);
+  --hover-bg: var(--blacktop-700);
+  --hover-ink: var(--text-primary);
+  --pressed-bg: var(--blacktop-700);
+  --pending-line: var(--grey-400);
+  --pending-ink: var(--grey-300);
+  --disabled-opacity: 0.55;
+  --disabled-ink: var(--grey-400);
+}
