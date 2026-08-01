@@ -38,9 +38,12 @@ module "web" {
   source = "./modules/web"
   count  = var.manage_web ? 1 : 0
 
-  app_name          = var.app_name
-  github_repository = var.github_repository
-  api_url           = module.api.url
+  app_name              = var.app_name
+  github_repository     = var.github_repository
+  api_url               = module.api.url
+  staging_api_url       = var.staging_api_url
+  clerk_publishable_key = var.clerk_publishable_key
+  clerk_secret_key      = var.clerk_secret_key
 }
 
 # -----------------------------------------------------------------------------

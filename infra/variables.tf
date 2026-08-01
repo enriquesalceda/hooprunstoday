@@ -64,6 +64,24 @@ variable "github_repository" {
 variable "clerk_issuer" {
   description = "Clerk instance issuer URL (public). One dev instance for all environments until the custom-domain prod instance exists."
   type        = string
-  # Placeholder until the Clerk instance issuer is known (see backend/CLAUDE.md).
-  default = "https://replace-with-your-instance.clerk.accounts.dev"
+  default     = "https://deep-seasnail-45.clerk.accounts.dev"
+}
+
+variable "clerk_publishable_key" {
+  description = "Clerk publishable key (public by design)"
+  type        = string
+  default     = "pk_test_ZGVlcC1zZWFzbmFpbC00NS5jbGVyay5hY2NvdW50cy5kZXYk"
+}
+
+variable "clerk_secret_key" {
+  description = "Clerk secret key for the Next.js server runtime. Supplied by CI (prod environment secret); empty skips the Vercel env var."
+  type        = string
+  sensitive   = true
+  default     = ""
+}
+
+variable "staging_api_url" {
+  description = "Staging API URL for Vercel preview/development targets. Literal because the staging workspace owns the value and cross-workspace reads aren't worth it for one stable string."
+  type        = string
+  default     = "https://hooprunstoday-api-staging-w273rowgva-uc.a.run.app"
 }

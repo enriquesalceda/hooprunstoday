@@ -18,7 +18,7 @@ services:
     environment:
       DATABASE_URL: postgres://hooprunstoday:hooprunstoday@db:5432/hooprunstoday?sslmode=disable
       # Pinned to the project's Clerk dev instance; override via root .env
-      CLERK_ISSUER: ${CLERK_ISSUER:-https://replace-with-your-instance.clerk.accounts.dev}
+      CLERK_ISSUER: ${CLERK_ISSUER:-https://deep-seasnail-45.clerk.accounts.dev}
     depends_on:
       migrate:
         condition: service_completed_successfully

@@ -241,6 +241,8 @@ jobs:
     env:
       NEON_API_KEY: ${{ secrets.NEON_API_KEY }}
       VERCEL_API_TOKEN: ${{ secrets.VERCEL_API_TOKEN }}
+      # Environment-scoped secret; feeds the Vercel CLERK_SECRET_KEY env var
+      TF_VAR_clerk_secret_key: ${{ secrets.CLERK_SECRET_KEY }}
     steps:
       - uses: actions/checkout@v4
         with:
