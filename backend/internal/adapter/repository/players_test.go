@@ -5,7 +5,7 @@ package repository_test
 import (
 	"context"
 	"database/sql"
-	"os"
+
 	"testing"
 	"time"
 
@@ -15,6 +15,7 @@ import (
 	"github.com/enriquesalceda/hooprunstoday/backend/internal/adapter/repository"
 	"github.com/enriquesalceda/hooprunstoday/backend/internal/domain"
 	"github.com/enriquesalceda/hooprunstoday/backend/internal/infrastructure/postgres"
+	"github.com/enriquesalceda/hooprunstoday/backend/internal/infrastructure/postgres/postgrestest"
 )
 
 var now = time.Date(2026, 8, 1, 12, 0, 0, 0, time.UTC)
@@ -203,21 +204,13 @@ func seededCourtID(t *testing.T, db *sql.DB) string {
 func openMigratedDB(t *testing.T) *sql.DB {
 	t.Helper()
 
-	url := os.Getenv("DATABASE_URL")
-	if url == "" {
-		url = "postgres://hooprunstoday:hooprunstoday@localhost:5433/hooprunstoday?sslmode=disable"
-	}
-
-	db, err := sql.Open("pgx", url)
-	require.NoError(t, err)
-	require.NoError(t, db.Ping())
+	db := postgrestest.Open(t, "hooprunstoday_test")
 	require.NoError(t, postgres.Migrate(context.Background(), db))
 
 	// Cleanup
 	t.Cleanup(func() {
 		_, err := db.Exec(`TRUNCATE players`)
 		require.NoError(t, err)
-		require.NoError(t, db.Close())
 	})
 
 	return db

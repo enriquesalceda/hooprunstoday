@@ -5,13 +5,14 @@ package postgres_test
 import (
 	"context"
 	"database/sql"
-	"os"
+
 	"testing"
 
 	_ "github.com/jackc/pgx/v5/stdlib"
 	"github.com/stretchr/testify/require"
 
 	"github.com/enriquesalceda/hooprunstoday/backend/internal/infrastructure/postgres"
+	"github.com/enriquesalceda/hooprunstoday/backend/internal/infrastructure/postgres/postgrestest"
 )
 
 func TestMigrate(t *testing.T) {
@@ -64,20 +65,14 @@ func TestMigrate(t *testing.T) {
 func openTestDB(t *testing.T) *sql.DB {
 	t.Helper()
 
-	url := os.Getenv("DATABASE_URL")
-	if url == "" {
-		url = "postgres://hooprunstoday:hooprunstoday@localhost:5433/hooprunstoday?sslmode=disable"
-	}
-
-	db, err := sql.Open("pgx", url)
-	require.NoError(t, err)
-	require.NoError(t, db.Ping())
+	// This test drops everything on cleanup, so it gets its own database —
+	// parallel test packages must never see its teardown.
+	db := postgrestest.Open(t, "hooprunstoday_test_migrations")
 
 	// Cleanup
 	t.Cleanup(func() {
 		_, err := db.Exec(`DROP TABLE IF EXISTS players; DROP TABLE IF EXISTS courts; DROP TABLE IF EXISTS goose_db_version; DROP EXTENSION IF EXISTS citext`)
 		require.NoError(t, err)
-		require.NoError(t, db.Close())
 	})
 
 	return db

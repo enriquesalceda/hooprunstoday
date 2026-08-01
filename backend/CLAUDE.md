@@ -149,6 +149,10 @@ func (s *spyRunStore) Save(_ context.Context, r domain.Run) error {
 - Use `t.Cleanup()` over `defer` for teardown.
 - Integration tests behind `//go:build integration`
   (`make test.integration`, requires Docker).
+- Integration tests connect via `postgrestest.Open`, which provisions
+  dedicated `hooprunstoday_test*` databases on the compose Postgres — test
+  cleanup must never touch the development database. `DATABASE_URL`
+  overrides for CI.
 
 ### Coverage Expectations
 
