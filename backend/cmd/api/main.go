@@ -18,6 +18,7 @@ import (
 	"github.com/enriquesalceda/hooprunstoday/backend/internal/infrastructure/clerk"
 	"github.com/enriquesalceda/hooprunstoday/backend/internal/infrastructure/config"
 	"github.com/enriquesalceda/hooprunstoday/backend/internal/usecase/checkhandle"
+	"github.com/enriquesalceda/hooprunstoday/backend/internal/usecase/createlead"
 	"github.com/enriquesalceda/hooprunstoday/backend/internal/usecase/createplayer"
 	"github.com/enriquesalceda/hooprunstoday/backend/internal/usecase/getplayer"
 	"github.com/enriquesalceda/hooprunstoday/backend/internal/usecase/listcourts"
@@ -49,12 +50,15 @@ func main() {
 	verifier := clerk.NewVerifier(cfg.ClerkIssuer, &http.Client{Timeout: 5 * time.Second})
 	players := repository.NewPlayers(db)
 	courts := repository.NewCourts(db)
+	leads := repository.NewLeads(db)
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /api/v1/health", adapterhttp.Health)
 	mux.Handle("POST /api/v1/players",
 		adapterhttp.RequireAuth(verifier,
 			adapterhttp.NewCreatePlayerHandler(createplayer.New(players, realClock{}), logger)))
+	mux.Handle("POST /api/v1/leads",
+		adapterhttp.NewCreateLeadHandler(createlead.New(leads), logger))
 	mux.Handle("GET /api/v1/courts",
 		adapterhttp.NewListCourtsHandler(listcourts.New(courts), logger))
 	mux.Handle("GET /api/v1/handles/{handle}",
