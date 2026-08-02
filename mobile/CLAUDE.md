@@ -1,3 +1,5 @@
+@AGENTS.md
+
 # Mobile Engineering Conventions (Expo + React Native + TypeScript)
 
 These conventions govern all code under `mobile/`. They mirror
@@ -29,8 +31,13 @@ src/
                  # the backend. The only place that knows endpoints.
   hooks/         # use-case boundary: orchestrate domain + api for the UI
   components/    # presentational. Props in, JSX out. No fetching.
-app/             # expo-router screens — wiring and composition only
+  app/           # expo-router routes — wiring and composition only
 ```
+
+- **`src/app/` is routes-only.** Every file in it becomes a route, so
+  never colocate components, tests, types, or utilities there (unlike the
+  Next.js App Router on web). Screen bodies live in `src/components/`;
+  their tests colocate beside them.
 
 - **`domain/` is sacred** — framework-free TypeScript, tested as plain
   functions. Keep it consistent with the web `domain/` (see "Shared
@@ -73,7 +80,8 @@ implementation; commit at green.
 ### Tooling
 
 - **Jest with the `jest-expo` preset** (Expo's supported runner) and
-  **React Native Testing Library**.
+  **React Native Testing Library**. RNTL v14+: `render`, `rerender`, and
+  `unmount` are async — always `await render(...)`.
 - **MSW** to stub the network at the HTTP boundary — the app exercises its
   real code paths against a fake server.
 - **Not allowed:** `jest.mock` of internal modules you own. Mocking is
