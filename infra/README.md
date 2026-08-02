@@ -53,5 +53,5 @@
 - **Fly.io** — its Terraform provider is archived/unmaintained.
 - **PR preview databases** — add later with Neon's branch-per-PR GitHub
   action against the staging project.
-- **Custom domain, Sentry, object storage (R2/GCS)** — add as modules when
-  the product needs them.
+- **Sentry, object storage (R2/GCS)** — add as modules when the product
+  needs them.
