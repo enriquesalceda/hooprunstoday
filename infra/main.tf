@@ -44,6 +44,7 @@ module "web" {
   staging_api_url       = var.staging_api_url
   clerk_publishable_key = var.clerk_publishable_key
   clerk_secret_key      = var.clerk_secret_key
+  domain                = var.web_domain
 }
 
 # -----------------------------------------------------------------------------

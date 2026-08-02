@@ -17,6 +17,21 @@ resource "vercel_project" "this" {
   }
 }
 
+# Attaching the domain is what makes Vercel DNS serve the zone — the
+# registrar already delegates to ns1/ns2.vercel-dns.com, so without these
+# resources the nameservers refuse queries and the site does not resolve.
+resource "vercel_project_domain" "apex" {
+  project_id = vercel_project.this.id
+  domain     = var.domain
+}
+
+resource "vercel_project_domain" "www" {
+  project_id           = vercel_project.this.id
+  domain               = "www.${var.domain}"
+  redirect             = vercel_project_domain.apex.domain
+  redirect_status_code = 308
+}
+
 resource "vercel_project_environment_variable" "api_url" {
   project_id = vercel_project.this.id
   key        = "NEXT_PUBLIC_API_URL"

@@ -85,3 +85,9 @@ variable "staging_api_url" {
   type        = string
   default     = "https://hooprunstoday-api-staging-w273rowgva-uc.a.run.app"
 }
+
+variable "web_domain" {
+  description = "Apex domain for the web app. Only read where manage_web is true (prod)."
+  type        = string
+  default     = "hoopruns.today"
+}

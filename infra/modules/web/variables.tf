@@ -27,3 +27,8 @@ variable "staging_api_url" {
   description = "API URL for preview/development deployments"
   type        = string
 }
+
+variable "domain" {
+  description = "Apex domain served by the production deployment"
+  type        = string
+}
