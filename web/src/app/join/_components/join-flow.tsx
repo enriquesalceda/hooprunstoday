@@ -9,6 +9,7 @@ import { IdentityStep } from "@/app/join/_components/identity-step";
 import { maskEmail } from "@/components/forms/email-field";
 import type { CodeInputState } from "@/components/forms/code-input";
 import { isValidEmail } from "@/domain/email";
+import { hasClerkErrorCode } from "@/lib/auth/clerk-error";
 
 const RESEND_SECONDS = 28;
 const MAX_ATTEMPTS = 3;
@@ -64,11 +65,12 @@ export function JoinFlow() {
 
     const { error: createError } = await signUp.create({ emailAddress: email });
 
-    if (createError && createError.code === "form_identifier_exists") {
+    if (hasClerkErrorCode(createError, "form_identifier_exists")) {
       const { error: signInError } = await signIn.create({ identifier: email });
       const { error: sendError } = signInError ? { error: signInError } : await signIn.emailCode.sendCode();
       setSending(false);
       if (sendError) {
+        console.error("sign-in code not sent:", sendError);
         setIdentityError("CODE NOT SENT · CHECK THE ADDRESS AND RETRY");
         return;
       }
@@ -77,6 +79,7 @@ export function JoinFlow() {
     }
 
     if (createError) {
+      console.error("sign-up not created:", createError);
       setSending(false);
       setIdentityError("CODE NOT SENT · CHECK THE ADDRESS AND RETRY");
       return;
@@ -85,6 +88,7 @@ export function JoinFlow() {
     const { error: sendError } = await signUp.verifications.sendEmailCode();
     setSending(false);
     if (sendError) {
+      console.error("sign-up code not sent:", sendError);
       setIdentityError("CODE NOT SENT · CHECK THE ADDRESS AND RETRY");
       return;
     }
