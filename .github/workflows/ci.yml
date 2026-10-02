@@ -25,6 +25,7 @@ jobs:
     outputs:
       backend: ${{ steps.filter.outputs.backend }}
       infra: ${{ steps.filter.outputs.infra }}
+      ios: ${{ steps.filter.outputs.ios }}
     steps:
       - uses: actions/checkout@v4
       - uses: dorny/paths-filter@v3
@@ -33,6 +34,10 @@ jobs:
           filters: |
             backend:
               - 'backend/**'
+            ios:
+              - 'ios/**'
+              - 'Makefile'
+              - '.github/workflows/ci.yml'
             infra:
               - 'infra/**'
               # Workflow changes alter how deploys run — treat them as infra
@@ -61,6 +66,51 @@ jobs:
       - name: Test
         working-directory: backend
         run: go test ./...
+
+  # ---------------------------------------------------------------------------
+  # iOS: format lint, package tests on macOS, full scheme on the simulator.
+  # Pinned image + Xcode so results don't drift with runner defaults. No
+  # signing, no deploy — TestFlight jobs come later.
+  # ---------------------------------------------------------------------------
+  ios-test:
+    name: iOS tests
+    runs-on: macos-26
+    needs: changes
+    if: needs.changes.outputs.ios == 'true'
+    timeout-minutes: 30
+    env:
+      XCODE_APP: /Applications/Xcode_26.6.app
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Select Xcode
+        run: |
+          sudo xcode-select -s "$XCODE_APP"
+          xcodebuild -version
+
+      - name: Install XcodeGen
+        run: brew install xcodegen
+
+      - name: Cache Swift packages
+        uses: actions/cache@v4
+        with:
+          path: ios/.build/DerivedData/SourcePackages
+          key: spm-${{ runner.os }}-${{ hashFiles('ios/project.yml', 'ios/Packages/HoopRunsKit/Package.swift') }}
+
+      - name: Format check
+        working-directory: ios
+        run: swift format lint --strict -r App AppTests UITests Packages/HoopRunsKit/Sources Packages/HoopRunsKit/Tests
+
+      - name: Test
+        run: make test.ios IOS_SIM="iPhone 17" IOS_OS=26.5
+
+      - name: Upload test results
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-test-results
+          path: ios/.build/Tests.xcresult
+          if-no-files-found: ignore
 
   # ---------------------------------------------------------------------------
   # Infra: format + validate (no cloud credentials needed)
@@ -282,5 +332,5 @@ jobs:
 
   # ---------------------------------------------------------------------------
   # Web (Vercel) deploys itself via the GitHub integration — no job needed.
-  # Native iOS jobs get added here when ios/ exists.
+  # iOS deploy jobs (TestFlight) get added here when there is a build to ship.
   # ---------------------------------------------------------------------------

@@ -17,21 +17,34 @@ final class ClerkAuthenticator: Authenticator {
 
     /// Clerk codes that mean "this code is wrong or no longer valid", as
     /// opposed to the check itself failing.
-    private static let rejectionCodes: Set<String> = [
-        "form_code_incorrect", "verification_expired", "verification_failed",
-    ]
+    nonisolated static func isRejection(code: String) -> Bool {
+        ["form_code_incorrect", "verification_expired", "verification_failed"].contains(code)
+    }
+
+    /// Sign-up refused because the email already has an account.
+    nonisolated static func isExistingEmail(code: String) -> Bool {
+        code == "form_identifier_exists"
+    }
 
     private let clerk: Clerk
+    private let startSignedOut: Bool
     private var attempt: Attempt?
 
-    init(clerk: Clerk) {
+    /// `startSignedOut` discards any persisted session before the first
+    /// restore — UI tests need a clean slate, and the simulator keychain keeps
+    /// Clerk's session across reinstalls.
+    init(clerk: Clerk, startSignedOut: Bool = false) {
         self.clerk = clerk
+        self.startSignedOut = startSignedOut
     }
 
     func restoreSession() async -> Bool {
         // Clerk loads its environment and any persisted client on configure.
         for _ in 0..<100 where !clerk.isLoaded {
             try? await Task.sleep(for: .milliseconds(100))
+        }
+        if startSignedOut, clerk.session != nil {
+            await signOut()
         }
         return clerk.session != nil
     }
@@ -40,7 +53,7 @@ final class ClerkAuthenticator: Authenticator {
         do {
             let signUp = try await clerk.auth.signUp(emailAddress: email)
             attempt = .signUp(try await signUp.sendEmailCode())
-        } catch let error as ClerkAPIError where error.code == "form_identifier_exists" {
+        } catch let error as ClerkAPIError where Self.isExistingEmail(code: error.code) {
             attempt = .signIn(try await clerk.auth.signInWithEmailCode(emailAddress: email))
         }
     }
@@ -75,7 +88,7 @@ final class ClerkAuthenticator: Authenticator {
             }
             attempt = nil
             return .verified
-        } catch let error as ClerkAPIError where Self.rejectionCodes.contains(error.code) {
+        } catch let error as ClerkAPIError where Self.isRejection(code: error.code) {
             return .rejected
         }
     }

@@ -26,6 +26,7 @@ ios/
   App/                   # thin app target: @main composition root, config,
                          # the Clerk adapter (ClerkAuthenticator), assets.
                          # Wires concrete dependencies; contains no logic
+  AppTests/              # unit tests for App/ (config, Clerk adapter rules)
   UITests/               # XCUITest end-to-end smoke tests
   Packages/HoopRunsKit/  # everything else, as SPM targets
     Sources/
@@ -73,8 +74,23 @@ implementation; commit at green.
   seconds. That is the TDD loop. Keep Domain, API and view-model logic
   platform-neutral so it stays testable there.
 - `make test.ios` runs `swift test`, then the `HoopRuns` scheme on the
-  simulator: package tests again on real iOS, plus the UI tests. Override
-  the device with `IOS_SIM="iPhone 17 Pro"`.
+  simulator: package tests again on real iOS, the `AppTests`, and the UI
+  tests. Override the device with `IOS_SIM="iPhone 17 Pro" IOS_OS=26.5`.
+- Keep `App/` thin, but when it has a rule (config parsing, which Clerk
+  error codes mean what), extract it as a plain function and test it in
+  `AppTests`.
+- UI tests launch with `-uitest-signed-out` so a session left in the
+  simulator keychain can't change where the app lands.
+
+### CI
+
+The `iOS tests` job in `.github/workflows/ci.yml` runs on `macos-26` with a
+pinned Xcode (`XCODE_APP`) whenever `ios/**`, the `Makefile` or the
+workflow changes. It runs `swift format lint --strict`, then `make
+test.ios`. On failure, the `.xcresult` bundle is uploaded as an artifact.
+The runner's Xcode can trail the local one, so don't use language features
+newer than the pinned Xcode. Bump `XCODE_APP` when the image adds a newer
+one.
 
 ### Style
 

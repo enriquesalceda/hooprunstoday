@@ -11,16 +11,18 @@ struct HoopRunsApp: App {
 
     init() {
         Fonts.register()
-        let config = AppConfig.load()
-        let auth = ClerkAuthenticator(clerk: Clerk.configure(publishableKey: config.clerkPublishableKey))
+        let config: AppConfig
+        do {
+            config = try AppConfig.load()
+        } catch {
+            fatalError("\(error)")
+        }
+        let auth = ClerkAuthenticator(
+            clerk: Clerk.configure(publishableKey: config.clerkPublishableKey),
+            startSignedOut: ProcessInfo.processInfo.arguments.contains("-uitest-signed-out")
+        )
         let api = APIClient(baseURL: config.apiBaseURL) { @MainActor in try await auth.token() }
         _model = State(initialValue: AppModel(auth: auth, loadMe: { await api.getMe() }))
-
-        // UI tests start from a clean slate: the simulator keychain keeps
-        // Clerk's session across reinstalls.
-        if ProcessInfo.processInfo.arguments.contains("-uitest-signed-out") {
-            Task { @MainActor in await auth.signOut() }
-        }
     }
 
     var body: some Scene {

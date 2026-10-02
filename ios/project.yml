@@ -56,6 +56,19 @@ targets:
         INFOPLIST_KEY_UISupportedInterfaceOrientations: UIInterfaceOrientationPortrait
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
 
+  HoopRunsTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources: [AppTests]
+    dependencies:
+      - target: HoopRuns
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: today.hoopruns.ios.tests
+        GENERATE_INFOPLIST_FILE: YES
+        BUNDLE_LOADER: $(TEST_HOST)
+        TEST_HOST: $(BUILT_PRODUCTS_DIR)/HoopRuns.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/HoopRuns
+
   HoopRunsUITests:
     type: bundle.ui-testing
     platform: iOS
@@ -79,4 +92,5 @@ schemes:
         - package: HoopRunsKit/APITests
         - package: HoopRunsKit/DesignSystemTests
         - package: HoopRunsKit/FeaturesTests
+        - HoopRunsTests
         - HoopRunsUITests

@@ -1,19 +1,27 @@
 import Foundation
 
-/// Values from Config/App.xcconfig, read once from Info.plist.
+/// Values from Config/App.xcconfig, surfaced through Info.plist.
 struct AppConfig {
+    struct Missing: Error, CustomStringConvertible {
+        let key: String
+        var description: String { "\(key) missing from Info.plist — see Config/App.xcconfig" }
+    }
+
     let apiBaseURL: URL
     let clerkPublishableKey: String
 
-    static func load(from bundle: Bundle = .main) -> AppConfig {
-        guard
-            let base = bundle.object(forInfoDictionaryKey: "APIBaseURL") as? String,
-            let url = URL(string: base),
-            let key = bundle.object(forInfoDictionaryKey: "ClerkPublishableKey") as? String,
-            !key.isEmpty
-        else {
-            fatalError("APIBaseURL / ClerkPublishableKey missing from Info.plist — see Config/App.xcconfig")
+    init(info: [String: Any]) throws {
+        guard let base = info["APIBaseURL"] as? String, !base.isEmpty, let url = URL(string: base) else {
+            throw Missing(key: "APIBaseURL")
         }
-        return AppConfig(apiBaseURL: url, clerkPublishableKey: key)
+        guard let key = info["ClerkPublishableKey"] as? String, !key.isEmpty else {
+            throw Missing(key: "ClerkPublishableKey")
+        }
+        apiBaseURL = url
+        clerkPublishableKey = key
+    }
+
+    static func load(from bundle: Bundle = .main) throws -> AppConfig {
+        try AppConfig(info: bundle.infoDictionary ?? [:])
     }
 }
