@@ -1,0 +1,9 @@
+// Build-time configuration, surfaced to the app through Info.plist.
+// Both values are public: the publishable key ships in every client.
+
+// The local Go API (`make docker.detach && make run`). The simulator shares
+// the Mac's network, so localhost works. `$()` keeps `//` from starting a comment.
+API_BASE_URL = http:/$()/localhost:8080
+
+// Clerk dev instance (deep-seasnail-45), the same one the backend trusts.
+CLERK_PUBLISHABLE_KEY = pk_test_ZGVlcC1zZWFzbmFpbC00NS5jbGVyay5hY2NvdW50cy5kZXYk

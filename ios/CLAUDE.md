@@ -11,7 +11,8 @@ These conventions govern all code under `ios/`.
 - **iOS 26 minimum**, iPhone only, portrait, dark UI.
 - Prefer the platform (`URLSession`, `Codable`, `Foundation` formatters)
   before reaching for a dependency. New dependencies need explicit
-  justification. Clerk's iOS SDK for auth is the one planned exception.
+  justification. Clerk's iOS SDK (`ClerkKit`, pinned in `project.yml`) is
+  the one exception, and only `App/` imports it.
 - Format with `swift format` (ships with the toolchain; config in
   `.swift-format`). `make fmt` runs it.
 
@@ -21,7 +22,9 @@ These conventions govern all code under `ios/`.
 ios/
   project.yml            # XcodeGen spec — the source of truth. HoopRuns.xcodeproj
                          # is generated (`make ios.project`) and never committed
-  App/                   # thin app target: @main composition root + assets.
+  Config/App.xcconfig    # API base URL + Clerk publishable key (both public)
+  App/                   # thin app target: @main composition root, config,
+                         # the Clerk adapter (ClerkAuthenticator), assets.
                          # Wires concrete dependencies; contains no logic
   UITests/               # XCUITest end-to-end smoke tests
   Packages/HoopRunsKit/  # everything else, as SPM targets
@@ -31,11 +34,11 @@ ios/
       API/               # the one HTTP client: Codable DTOs mapped to Domain.
                          # The only place that knows endpoints
       DesignSystem/      # tokens, fonts, shared chrome (header, logo, dot)
-      Features/          # SwiftUI screens + @Observable view models
+      Features/          # SwiftUI screens + @Observable view models, and the
+                         # `Authenticator` port the Clerk adapter implements
 ```
 
-`Domain/` and `API/` don't exist yet. Create each one when its first real
-type arrives: no empty modules.
+New modules arrive with their first real type: no empty targets.
 
 Dependencies point inward: `Features → API, DesignSystem → Domain`. Each
 layer is its own SPM target, so the compiler enforces the direction: a
@@ -101,6 +104,20 @@ wholesale on each handoff import, so don't edit it here.
 - Two families only: Anton (bundled, registered via `Fonts.register()` at
   launch) and the system monospace. No corner radius except the status
   dot, no shadows, no gradients, ALL CAPS labels.
+
+## Auth
+
+- Clerk email-code sign-in, mirroring the web join flow: try sign-up, and
+  on `form_identifier_exists` switch to an email-code sign-in.
+- `Features` only knows the `Authenticator` protocol. `App/ClerkAuthenticator`
+  adapts ClerkKit to it. View models are tested with `FakeAuthenticator`;
+  the adapter is thin and verified end to end.
+- The API gets a fresh Clerk session JWT per request (`APIClient`'s token
+  provider). Tokens live ~60s, so never cache one.
+- The backend accepts tokens from the dev instance in `Config/App.xcconfig`.
+  The issuer must match the backend's `CLERK_ISSUER`.
+- To test sign-in manually without real email, use a `+clerk_test` address
+  with code `424242` (Clerk dev instances only).
 
 ## Shared Domain with Web
 

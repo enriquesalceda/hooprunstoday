@@ -9,6 +9,7 @@ struct TypeScaleTests {
         #expect(TypeScale.mono1 == 8.5)
         #expect(TypeScale.mono2 == 9)
         #expect(TypeScale.mono4 == 10)
+        #expect(TypeScale.mono7 == 12)
         #expect(TypeScale.mono8 == 13)
     }
 
@@ -34,5 +35,8 @@ struct SpacingTests {
         #expect(Spacing.hitMin == 44)
         #expect(Spacing.dot == 6)
         #expect(Spacing.hairline == 1)
+        #expect(Spacing.button == 60)
+        #expect(Spacing.s9 == 20)
+        #expect(Spacing.s10 == 22)
     }
 }

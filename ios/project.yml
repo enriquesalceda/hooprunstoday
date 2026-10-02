@@ -10,21 +10,40 @@ options:
 packages:
   HoopRunsKit:
     path: Packages/HoopRunsKit
+  Clerk:
+    url: https://github.com/clerk/clerk-ios
+    exactVersion: 1.5.8
 
 settings:
   base:
     SWIFT_VERSION: "6.0"
     MARKETING_VERSION: "0.1.0"
     CURRENT_PROJECT_VERSION: "1"
+    DEVELOPMENT_TEAM: E8ZC4ECH2G
+    CODE_SIGN_STYLE: Automatic
 
 targets:
   HoopRuns:
     type: application
     platform: iOS
     sources: [App]
+    configFiles:
+      Debug: Config/App.xcconfig
+      Release: Config/App.xcconfig
+    info:
+      path: App/Info.plist
+      properties:
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        APIBaseURL: $(API_BASE_URL)
+        ClerkPublishableKey: $(CLERK_PUBLISHABLE_KEY)
+        NSAppTransportSecurity:
+          NSAllowsLocalNetworking: true
     dependencies:
       - package: HoopRunsKit
-        products: [DesignSystem, Features]
+        products: [API, DesignSystem, Features]
+      - package: Clerk
+        product: ClerkKit
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: today.hoopruns.ios
@@ -56,5 +75,8 @@ schemes:
         HoopRuns: all
     test:
       targets:
+        - package: HoopRunsKit/DomainTests
+        - package: HoopRunsKit/APITests
         - package: HoopRunsKit/DesignSystemTests
+        - package: HoopRunsKit/FeaturesTests
         - HoopRunsUITests

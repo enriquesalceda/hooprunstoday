@@ -13,6 +13,7 @@ public enum TypeScale {
     public static let mono3: CGFloat = 9.5
     public static let mono4: CGFloat = 10
     public static let mono6: CGFloat = 11
+    public static let mono7: CGFloat = 12
     public static let mono8: CGFloat = 13
 }
 
