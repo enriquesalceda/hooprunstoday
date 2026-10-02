@@ -42,6 +42,36 @@ func TestCreateLeadHandler(t *testing.T) {
 		creator := &stubLeadCreator{out: createlead.Output{Lead: domain.Lead{
 			ID: "uuid-1", Name: "Jordan", Method: domain.ContactEmail,
 			Contact:   "jordan@example.com",
+			Phone:     "+61412345678",
+			CreatedAt: time.Date(2026, 8, 2, 12, 0, 0, 0, time.UTC),
+		}}}
+
+		// Exercise
+		rec := postLead(t, creator,
+			`{"name":"Jordan","contact_method":"EMAIL","contact":"jordan@example.com","phone":"+61412345678"}`)
+
+		// Expectations
+		require.Equal(t, http.StatusCreated, rec.Code)
+		require.Equal(t, createlead.Input{
+			Name: "Jordan", Method: domain.ContactEmail, Contact: "jordan@example.com",
+			Phone: "+61412345678",
+		}, creator.in)
+
+		var body map[string]*string
+		require.NoError(t, json.NewDecoder(rec.Body).Decode(&body))
+		require.Equal(t, "uuid-1", *body["id"])
+		require.Equal(t, "Jordan", *body["name"])
+		require.Equal(t, "EMAIL", *body["contact_method"])
+		require.Equal(t, "jordan@example.com", *body["contact"])
+		require.Equal(t, "+61412345678", *body["phone"])
+		require.Equal(t, "2026-08-02T12:00:00Z", *body["created_at"])
+	})
+
+	t.Run("a lead without a phone responds with a null phone", func(t *testing.T) {
+		// Setup
+		creator := &stubLeadCreator{out: createlead.Output{Lead: domain.Lead{
+			ID: "uuid-1", Name: "Jordan", Method: domain.ContactEmail,
+			Contact:   "jordan@example.com",
 			CreatedAt: time.Date(2026, 8, 2, 12, 0, 0, 0, time.UTC),
 		}}}
 
@@ -51,17 +81,11 @@ func TestCreateLeadHandler(t *testing.T) {
 
 		// Expectations
 		require.Equal(t, http.StatusCreated, rec.Code)
-		require.Equal(t, createlead.Input{
-			Name: "Jordan", Method: domain.ContactEmail, Contact: "jordan@example.com",
-		}, creator.in)
-
-		var body map[string]string
+		require.Equal(t, "", creator.in.Phone)
+		var body map[string]*string
 		require.NoError(t, json.NewDecoder(rec.Body).Decode(&body))
-		require.Equal(t, "uuid-1", body["id"])
-		require.Equal(t, "Jordan", body["name"])
-		require.Equal(t, "EMAIL", body["contact_method"])
-		require.Equal(t, "jordan@example.com", body["contact"])
-		require.Equal(t, "2026-08-02T12:00:00Z", body["created_at"])
+		require.Contains(t, body, "phone")
+		require.Nil(t, body["phone"])
 	})
 
 	t.Run("rejects a malformed body", func(t *testing.T) {
@@ -82,6 +106,7 @@ func TestCreateLeadHandler(t *testing.T) {
 			{"invalid name", domain.ErrInvalidLeadName, "name"},
 			{"invalid method", domain.ErrInvalidContactMethod, "contact_method"},
 			{"invalid contact", domain.ErrInvalidLeadContact, "contact"},
+			{"invalid phone", domain.ErrInvalidLeadPhone, "phone"},
 		}
 		for _, tc := range cases {
 			t.Run(tc.name, func(t *testing.T) {

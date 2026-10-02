@@ -55,6 +55,37 @@ func TestLeads(t *testing.T) {
 		require.Equal(t, 1, count)
 	})
 
+	t.Run("stores the optional phone and keeps it when a resubmission omits it", func(t *testing.T) {
+		// Setup
+		db := openLeadsDB(t)
+		leads := repository.NewLeads(db)
+		withPhone := mustNewLead(t, "Jordan", domain.ContactEmail, "jordan@example.com")
+		withPhone.Phone = "+61412345678"
+
+		// Exercise
+		first, err := leads.Save(context.Background(), withPhone)
+		require.NoError(t, err)
+		second, err := leads.Save(context.Background(), mustNewLead(t, "Jordan", domain.ContactEmail, "jordan@example.com"))
+
+		// Expectations
+		require.NoError(t, err)
+		require.Equal(t, "+61412345678", first.Phone)
+		require.Equal(t, "+61412345678", second.Phone, "a resubmission without a phone keeps the stored one")
+	})
+
+	t.Run("a lead without a phone round-trips as empty", func(t *testing.T) {
+		// Setup
+		db := openLeadsDB(t)
+		leads := repository.NewLeads(db)
+
+		// Exercise
+		stored, err := leads.Save(context.Background(), mustNewLead(t, "Jordan", domain.ContactEmail, "jordan@example.com"))
+
+		// Expectations
+		require.NoError(t, err)
+		require.Equal(t, "", stored.Phone)
+	})
+
 	t.Run("the same contact under a different method is a separate lead", func(t *testing.T) {
 		// Setup
 		db := openLeadsDB(t)

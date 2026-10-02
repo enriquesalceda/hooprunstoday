@@ -124,6 +124,56 @@ func TestNewLead(t *testing.T) {
 			})
 		}
 	})
+
+	t.Run("keeps an optional phone in E.164 form", func(t *testing.T) {
+		// Setup
+		params := domain.LeadParams{
+			Name: "Jordan", Method: domain.ContactEmail, Contact: "jordan@example.com",
+			Phone: " +61 (412) 345-678 ",
+		}
+
+		// Exercise
+		lead, err := domain.NewLead(params)
+
+		// Expectations
+		require.NoError(t, err)
+		require.Equal(t, "+61412345678", lead.Phone)
+	})
+
+	t.Run("a blank phone means no phone", func(t *testing.T) {
+		// Exercise
+		lead, err := domain.NewLead(domain.LeadParams{
+			Name: "Jordan", Method: domain.ContactEmail, Contact: "jordan@example.com", Phone: "   ",
+		})
+
+		// Expectations
+		require.NoError(t, err)
+		require.Equal(t, "", lead.Phone)
+	})
+
+	t.Run("rejects invalid phones", func(t *testing.T) {
+		cases := []struct {
+			name  string
+			value string
+		}{
+			{"no country code", "0412345678"},
+			{"letters", "+61 call me"},
+			{"too short", "+61123"},
+			{"too long", "+1234567890123456"},
+			{"leading zero after plus", "+0412345678"},
+		}
+		for _, tc := range cases {
+			t.Run(tc.name, func(t *testing.T) {
+				// Exercise
+				_, err := domain.NewLead(domain.LeadParams{
+					Name: "Jordan", Method: domain.ContactEmail, Contact: "a@b.co", Phone: tc.value,
+				})
+
+				// Expectations
+				require.ErrorIs(t, err, domain.ErrInvalidLeadPhone)
+			})
+		}
+	})
 }
 
 func TestParseContactMethod(t *testing.T) {

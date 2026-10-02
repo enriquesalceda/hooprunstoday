@@ -39,6 +39,7 @@ func TestCreateLead(t *testing.T) {
 		// Exercise
 		out, err := uc.Execute(context.Background(), createlead.Input{
 			Name: " Jordan ", Method: domain.ContactEmail, Contact: "Jordan@Example.com",
+			Phone: "+61 412 345 678",
 		})
 
 		// Expectations
@@ -47,6 +48,7 @@ func TestCreateLead(t *testing.T) {
 		require.Len(t, store.saved, 1)
 		require.Equal(t, "Jordan", store.saved[0].Name, "name trimmed before saving")
 		require.Equal(t, "jordan@example.com", store.saved[0].Contact, "contact normalized before saving")
+		require.Equal(t, "+61412345678", store.saved[0].Phone, "phone normalized before saving")
 	})
 
 	t.Run("rejects invalid input without touching the store", func(t *testing.T) {

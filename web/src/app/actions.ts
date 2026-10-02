@@ -9,5 +9,6 @@ export async function submitLead(input: CreateLeadInput): Promise<CreateLeadResu
     name: String(input.name),
     contactMethod: input.contactMethod === "MOBILE" ? "MOBILE" : "EMAIL",
     contact: String(input.contact),
+    phone: input.phone === null ? null : String(input.phone),
   });
 }

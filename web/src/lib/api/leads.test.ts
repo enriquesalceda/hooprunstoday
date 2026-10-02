@@ -18,6 +18,7 @@ const input = {
   name: "Jordan",
   contactMethod: "EMAIL" as const,
   contact: "jordan@example.com",
+  phone: null,
 };
 
 describe("createLead", () => {
@@ -32,6 +33,7 @@ describe("createLead", () => {
             name: "Jordan",
             contact_method: "EMAIL",
             contact: "jordan@example.com",
+            phone: null,
             created_at: "2026-08-02T12:00:00Z",
           },
           { status: 201 },
@@ -45,6 +47,7 @@ describe("createLead", () => {
       name: "Jordan",
       contact_method: "EMAIL",
       contact: "jordan@example.com",
+      phone: null,
     });
     expect(result).toEqual({
       ok: true,
@@ -53,9 +56,35 @@ describe("createLead", () => {
         name: "Jordan",
         contactMethod: "EMAIL",
         contact: "jordan@example.com",
+        phone: null,
         createdAt: "2026-08-02T12:00:00Z",
       },
     });
+  });
+
+  it("carries the optional phone both ways", async () => {
+    let seenBody: unknown;
+    server.use(
+      http.post(`${API_URL}/api/v1/leads`, async ({ request }) => {
+        seenBody = await request.json();
+        return HttpResponse.json(
+          {
+            id: "uuid-1",
+            name: "Jordan",
+            contact_method: "EMAIL",
+            contact: "jordan@example.com",
+            phone: "+61412345678",
+            created_at: "2026-08-02T12:00:00Z",
+          },
+          { status: 201 },
+        );
+      }),
+    );
+
+    const result = await createLead({ ...input, phone: "+61412345678" });
+
+    expect(seenBody).toMatchObject({ phone: "+61412345678" });
+    expect(result).toMatchObject({ ok: true, lead: { phone: "+61412345678" } });
   });
 
   it("carries field details on validation failures", async () => {

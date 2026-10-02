@@ -1,0 +1,246 @@
+/* The waitlist form from the landing handoff: three fields and the button
+   in one row, each wrapping to full width under 720px. */
+.form {
+  margin-top: clamp(14px, 3vh, 32px);
+  width: min(100%, 960px);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+/* flex-basis flips between 0 and "all of it" at 720px: one row on wide
+   screens, stacked below. */
+.field {
+  flex: 1 1 calc((720px - 100%) * 999);
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.name {
+  flex-grow: 2;
+}
+
+.email {
+  flex-grow: 3;
+}
+
+.mobile {
+  flex-grow: 3.4;
+}
+
+.submit {
+  flex-grow: 2.4;
+}
+
+.input {
+  width: 100%;
+  height: 46px;
+  background: transparent;
+  border: 1px solid var(--line-interactive);
+  border-radius: 0;
+  color: var(--text-primary);
+  caret-color: var(--text-primary);
+  font-family: inherit;
+  font-size: var(--mono-8);
+  font-weight: var(--weight-data);
+  letter-spacing: var(--track-label);
+  padding: 0 14px;
+  outline: none;
+}
+
+.input::placeholder {
+  color: var(--text-faint);
+}
+
+.input:hover {
+  border-color: var(--text-muted);
+}
+
+.input:focus {
+  border-color: var(--text-primary);
+}
+
+.input[aria-invalid="true"] {
+  border-color: var(--text-primary);
+}
+
+/* The phone control is a select and an input sharing one frame; the frame
+   takes the focus ring so the pieces read as one field. */
+.phoneFrame {
+  display: flex;
+  height: 46px;
+  border: 1px solid var(--line-interactive);
+}
+
+.phoneFrame:hover {
+  border-color: var(--text-muted);
+}
+
+.phoneFrame:focus-within,
+.phoneFrame[aria-invalid="true"] {
+  border-color: var(--text-primary);
+}
+
+.countryWrap {
+  position: relative;
+  display: flex;
+  border-right: 1px solid var(--line-interactive);
+}
+
+.country {
+  appearance: none;
+  background: var(--surface-app);
+  color: var(--text-primary);
+  border: 0;
+  border-radius: 0;
+  font-family: inherit;
+  font-size: var(--mono-7);
+  font-weight: var(--weight-action);
+  letter-spacing: 0.08em;
+  padding: 0 28px 0 12px;
+  cursor: pointer;
+  outline: none;
+}
+
+.caret {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 8px;
+  color: var(--text-primary);
+  pointer-events: none;
+  line-height: 1;
+}
+
+.phone {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  color: var(--text-primary);
+  caret-color: var(--text-primary);
+  font-family: inherit;
+  font-size: var(--mono-8);
+  font-weight: var(--weight-data);
+  letter-spacing: var(--track-label);
+  padding: 0 14px;
+  outline: none;
+}
+
+.phone::placeholder {
+  color: var(--text-faint);
+}
+
+.button {
+  min-width: 0;
+  height: 46px;
+  background: var(--selected-bg);
+  color: var(--selected-ink);
+  border: 1px solid var(--paper-000);
+  border-radius: 0;
+  font-family: inherit;
+  font-size: var(--mono-6);
+  font-weight: var(--weight-action);
+  letter-spacing: var(--track-action);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  white-space: nowrap;
+  padding: 0 18px;
+  transition:
+    background 160ms linear,
+    color 160ms linear;
+}
+
+.button:hover:enabled {
+  background: transparent;
+  color: var(--text-primary);
+}
+
+.button:disabled {
+  cursor: default;
+}
+
+.pulse {
+  width: 7px;
+  height: 7px;
+  background: currentColor;
+  display: block;
+  animation: hr-pulse var(--dur-pulse, 1.6s) ease-in-out infinite;
+}
+
+.error {
+  align-self: flex-start;
+  background: var(--surface-inverted);
+  color: var(--text-on-inverted);
+  font-size: var(--mono-2);
+  font-weight: var(--weight-action);
+  letter-spacing: var(--track-nav);
+  padding: 4px 6px 3px;
+  line-height: 1;
+}
+
+.hint {
+  font-size: var(--mono-2);
+  font-weight: var(--weight-action);
+  letter-spacing: var(--track-nav);
+  color: var(--text-muted);
+  line-height: 1;
+  padding: 4px 0 3px;
+  align-self: center;
+  text-align: center;
+}
+
+.honeypot {
+  display: none;
+  visibility: hidden;
+}
+
+.consent {
+  margin: 0 auto;
+  max-width: 960px;
+  font-size: var(--mono-1);
+  line-height: 1.4;
+  color: var(--text-muted);
+  letter-spacing: 0;
+  text-align: center;
+  text-wrap: balance;
+}
+
+.sent {
+  margin-top: clamp(14px, 3vh, 32px);
+  min-height: 46px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  text-align: center;
+}
+
+.sentLine {
+  font-size: var(--mono-8);
+  letter-spacing: var(--track-action);
+  font-weight: var(--weight-action);
+}
+
+.sentSub {
+  font-size: var(--mono-2);
+  letter-spacing: var(--track-nav);
+  font-weight: var(--weight-action);
+  color: var(--text-muted);
+}

@@ -8,6 +8,8 @@ export type Lead = {
   name: string;
   contactMethod: ContactMethod;
   contact: string;
+  /* E.164, or null when the lead did not opt into SMS alerts */
+  phone: string | null;
   createdAt: string;
 };
 
@@ -25,6 +27,7 @@ export type CreateLeadInput = {
   name: string;
   contactMethod: ContactMethod;
   contact: string;
+  phone: string | null;
 };
 
 export async function createLead(input: CreateLeadInput): Promise<CreateLeadResult> {
@@ -37,6 +40,7 @@ export async function createLead(input: CreateLeadInput): Promise<CreateLeadResu
         name: input.name,
         contact_method: input.contactMethod,
         contact: input.contact,
+        phone: input.phone,
       }),
     });
   } catch {
@@ -49,6 +53,7 @@ export async function createLead(input: CreateLeadInput): Promise<CreateLeadResu
       name: string;
       contact_method: ContactMethod;
       contact: string;
+      phone: string | null;
       created_at: string;
     };
     return {
@@ -58,6 +63,7 @@ export async function createLead(input: CreateLeadInput): Promise<CreateLeadResu
         name: body.name,
         contactMethod: body.contact_method,
         contact: body.contact,
+        phone: body.phone ?? null,
         createdAt: body.created_at,
       },
     };
