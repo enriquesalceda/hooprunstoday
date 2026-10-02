@@ -21,14 +21,16 @@ type createLeadRequest struct {
 	Name          string `json:"name"`
 	ContactMethod string `json:"contact_method"`
 	Contact       string `json:"contact"`
+	Phone         string `json:"phone"` // optional
 }
 
 type leadResponse struct {
-	ID            string `json:"id"`
-	Name          string `json:"name"`
-	ContactMethod string `json:"contact_method"`
-	Contact       string `json:"contact"`
-	CreatedAt     string `json:"created_at"`
+	ID            string  `json:"id"`
+	Name          string  `json:"name"`
+	ContactMethod string  `json:"contact_method"`
+	Contact       string  `json:"contact"`
+	Phone         *string `json:"phone"` // null when the lead gave none
+	CreatedAt     string  `json:"created_at"`
 }
 
 // NewCreateLeadHandler handles POST /api/v1/leads. Public: the landing page
@@ -46,17 +48,23 @@ func NewCreateLeadHandler(creator LeadCreator, logger *slog.Logger) http.Handler
 			Name:    req.Name,
 			Method:  domain.ContactMethod(req.ContactMethod),
 			Contact: req.Contact,
+			Phone:   req.Phone,
 		})
 		if err != nil {
 			respondCreateLeadError(w, logger, req, err)
 			return
 		}
 
+		var phone *string
+		if out.Lead.Phone != "" {
+			phone = &out.Lead.Phone
+		}
 		respondJSON(w, http.StatusCreated, leadResponse{
 			ID:            out.Lead.ID,
 			Name:          out.Lead.Name,
 			ContactMethod: string(out.Lead.Method),
 			Contact:       out.Lead.Contact,
+			Phone:         phone,
 			CreatedAt:     out.Lead.CreatedAt.UTC().Format(time.RFC3339),
 		})
 	})
@@ -67,6 +75,7 @@ func respondCreateLeadError(w http.ResponseWriter, logger *slog.Logger, req crea
 		"name":           domain.ErrInvalidLeadName,
 		"contact_method": domain.ErrInvalidContactMethod,
 		"contact":        domain.ErrInvalidLeadContact,
+		"phone":          domain.ErrInvalidLeadPhone,
 	}
 	for field, sentinel := range validation {
 		if errors.Is(err, sentinel) {
@@ -78,6 +87,6 @@ func respondCreateLeadError(w http.ResponseWriter, logger *slog.Logger, req crea
 
 	logger.Error("creating lead",
 		"contact_method", req.ContactMethod, "name_len", len(req.Name),
-		"contact_len", len(req.Contact), "error", err)
+		"contact_len", len(req.Contact), "phone_len", len(req.Phone), "error", err)
 	respondError(w, http.StatusInternalServerError, "internal", "something went wrong")
 }

@@ -1,0 +1,104 @@
+/* Pre-launch landing (handoff v12): one dark screen, centered — status bar,
+   stacked wordmark, three pillars, the waitlist form. Scales with the
+   viewport height so it fits a laptop without scrolling. */
+.page {
+  min-height: 100vh;
+  background: var(--surface-app);
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(20px, 4vh, 48px) clamp(16px, 4vw, 48px);
+}
+
+.bar {
+  width: min(100%, 960px);
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  font-size: clamp(10px, 1.2vh, 13px);
+  letter-spacing: var(--track-bar);
+  font-weight: var(--weight-action);
+}
+
+.live {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.dot {
+  width: 7px;
+  height: 7px;
+  background: var(--text-primary);
+  display: block;
+  animation: hr-pulse var(--dur-pulse) ease-in-out infinite;
+}
+
+.lockup {
+  margin-top: clamp(24px, 6vh, 64px);
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: clamp(8px, 1.6vh, 16px);
+  width: fit-content;
+  max-width: 100%;
+}
+
+/* Height-driven: 40% of the viewport, but never taller than what leaves
+   room for the rest, and never wider than the screen (aspect 1.152). */
+.wordmark {
+  display: block;
+  height: min(40vh, calc(100vh - 345px), calc((100vw - 32px) / 1.152));
+  width: auto;
+  max-width: 100%;
+}
+
+.today {
+  border: var(--border-inverted);
+  padding: clamp(6px, 1.1vh, 10px) 0 clamp(6px, 1.1vh, 10px) 0.7em;
+  text-align: center;
+  font-size: clamp(12px, 2.2vh, 20px);
+  font-weight: var(--weight-action);
+  letter-spacing: 0.7em;
+  line-height: 1;
+  color: var(--text-primary);
+}
+
+.pillars {
+  margin-top: clamp(16px, 4vh, 40px);
+  width: min(100%, 960px);
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1px;
+  background: var(--line-hairline);
+  border: var(--border-hairline);
+  text-align: left;
+}
+
+.pillar {
+  background: var(--surface-app);
+  padding: clamp(10px, 1.6vh, 16px) 20px;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(4px, 0.8vh, 8px);
+  min-width: 0;
+}
+
+.pillarLabel {
+  font-family: var(--font-mono);
+  font-size: clamp(9px, 1.2vh, 11px);
+  font-weight: var(--weight-action);
+  letter-spacing: var(--track-action);
+  color: var(--text-muted);
+}
+
+.pillarLine {
+  font-family: var(--font-display);
+  font-size: clamp(13px, 1.9vh, 16px);
+  line-height: 1.15;
+  letter-spacing: 0.04em;
+  color: var(--text-primary);
+}

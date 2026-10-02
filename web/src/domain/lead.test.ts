@@ -1,56 +1,55 @@
 import { describe, expect, it } from "vitest";
 
-import { canSubmitLead, firstName, isValidMobile } from "@/domain/lead";
+import { firstName, titleCaseName, validateLead } from "@/domain/lead";
 
-describe("isValidMobile", () => {
-  it("accepts plain digit numbers", () => {
-    expect(isValidMobile("0412345678")).toBe(true);
+const valid = { name: "Jordan", email: "j@court.com", phone: "", country: "US" as const };
+
+describe("validateLead", () => {
+  it("passes a named email lead", () => {
+    expect(validateLead(valid)).toEqual({});
   });
 
-  it("accepts international numbers with punctuation people type", () => {
-    expect(isValidMobile("+61 (412) 345-678")).toBe(true);
+  it("requires a name", () => {
+    expect(validateLead({ ...valid, name: "   " })).toEqual({ name: "required" });
   });
 
-  it("rejects numbers that are too short", () => {
-    expect(isValidMobile("12345")).toBe(false);
+  it("requires an email", () => {
+    expect(validateLead({ ...valid, email: "" })).toEqual({ email: "required" });
   });
 
-  it("rejects numbers that are too long", () => {
-    expect(isValidMobile("1234567890123456")).toBe(false);
+  it("rejects a malformed email", () => {
+    expect(validateLead({ ...valid, email: "not-an-email" })).toEqual({ email: "invalid" });
   });
 
-  it("rejects letters", () => {
-    expect(isValidMobile("call me maybe")).toBe(false);
+  it("accepts a phone of the right length for its country", () => {
+    expect(validateLead({ ...valid, phone: "4155550123" })).toEqual({});
   });
 
-  it("rejects a plus sign that is not leading", () => {
-    expect(isValidMobile("04+12345678")).toBe(false);
+  it("rejects a phone of the wrong length for its country", () => {
+    expect(validateLead({ ...valid, phone: "415555" })).toEqual({ phone: "invalid" });
   });
 
-  it("rejects the empty string", () => {
-    expect(isValidMobile("")).toBe(false);
+  it("reports every failing field at once", () => {
+    expect(validateLead({ name: "", email: "", phone: "1", country: "AU" })).toEqual({
+      name: "required",
+      email: "required",
+      phone: "invalid",
+    });
   });
 });
 
-describe("canSubmitLead", () => {
-  it("allows a named email lead with a valid address", () => {
-    expect(canSubmitLead({ name: "Jordan", method: "EMAIL", contact: "j@court.com" })).toBe(true);
+describe("titleCaseName", () => {
+  it("capitalises each word as it is typed", () => {
+    expect(titleCaseName("jordan miller")).toBe("Jordan Miller");
   });
 
-  it("allows a named mobile lead with a valid number", () => {
-    expect(canSubmitLead({ name: "Jordan", method: "MOBILE", contact: "0412345678" })).toBe(true);
+  it("capitalises after hyphens and apostrophes", () => {
+    expect(titleCaseName("mary-jane o'neil")).toBe("Mary-Jane O'Neil");
   });
 
-  it("blocks a blank name", () => {
-    expect(canSubmitLead({ name: "   ", method: "EMAIL", contact: "j@court.com" })).toBe(false);
-  });
-
-  it("blocks an invalid email", () => {
-    expect(canSubmitLead({ name: "Jordan", method: "EMAIL", contact: "not-an-email" })).toBe(false);
-  });
-
-  it("blocks an invalid mobile", () => {
-    expect(canSubmitLead({ name: "Jordan", method: "MOBILE", contact: "12" })).toBe(false);
+  it("strips leading whitespace and caps the length", () => {
+    expect(titleCaseName("   jo")).toBe("Jo");
+    expect(titleCaseName("a".repeat(60))).toHaveLength(50);
   });
 });
 

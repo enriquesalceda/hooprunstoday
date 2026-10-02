@@ -11,6 +11,7 @@ type Input struct {
 	Name    string
 	Method  domain.ContactMethod
 	Contact string
+	Phone   string // optional; empty means no SMS alerts
 }
 
 type Output struct {
@@ -36,6 +37,7 @@ func (uc *CreateLead) Execute(ctx context.Context, in Input) (Output, error) {
 		Name:    in.Name,
 		Method:  in.Method,
 		Contact: in.Contact,
+		Phone:   in.Phone,
 	})
 	if err != nil {
 		return Output{}, err
