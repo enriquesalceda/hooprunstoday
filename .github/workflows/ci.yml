@@ -6,6 +6,13 @@ on:
   pull_request:
     branches: [main]
 
+# One run per ref at a time. On main, runs queue instead of overlapping, so
+# two deploys can't race (an infra-only run once deployed an image another
+# run was still building). PR runs cancel superseded ones.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 permissions:
   contents: read
   pull-requests: write
@@ -198,9 +205,13 @@ jobs:
     name: Build API image
     runs-on: ubuntu-latest
     needs: [changes, backend-test]
+    # Runs on every push to main, not only backend ones: GitHub cancels a
+    # queued run when a newer one arrives, so the run that changed backend/
+    # may never build. The step below builds only if the image is missing.
     if: |
-      github.event_name == 'push' &&
-      needs.changes.outputs.backend == 'true'
+      always() && github.event_name == 'push' &&
+      needs.changes.result == 'success' &&
+      needs.backend-test.result != 'failure' && needs.backend-test.result != 'cancelled'
     steps:
       - uses: actions/checkout@v4
         with:
@@ -219,10 +230,14 @@ jobs:
       # Tag with the last commit that touched backend/ (== github.sha on
       # backend pushes). Deploy jobs resolve the same tag, so infra-only
       # pushes reuse the image already in the registry.
-      - name: Build and push
+      - name: Build and push (if missing)
         working-directory: backend
         run: |
           TAG=$(git log -1 --format=%H -- .)
+          if gcloud artifacts docker images describe "$IMAGE:$TAG" --quiet >/dev/null 2>&1; then
+            echo "$IMAGE:$TAG already in the registry, skipping build"
+            exit 0
+          fi
           docker build -t "$IMAGE:$TAG" .
           docker push "$IMAGE:$TAG"
 
@@ -233,10 +248,11 @@ jobs:
     name: Deploy staging
     runs-on: ubuntu-latest
     needs: [changes, build-image]
-    # always() lets infra-only pushes (build skipped) still apply
+    # build-image guarantees the image for the last backend commit exists.
     if: |
       always() && github.event_name == 'push' &&
-      (needs.build-image.result == 'success' || (needs.build-image.result == 'skipped' && needs.changes.outputs.infra == 'true'))
+      needs.build-image.result == 'success' &&
+      (needs.changes.outputs.backend == 'true' || needs.changes.outputs.infra == 'true')
     environment: staging
     env:
       NEON_API_KEY: ${{ secrets.NEON_API_KEY }}
