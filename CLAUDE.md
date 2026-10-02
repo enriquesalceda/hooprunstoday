@@ -7,7 +7,6 @@ consider long-term maintainability, and write production-quality code.
 
 - `backend/` — Go API, deployed to GCP Cloud Run. Postgres on Neon.
 - `web/` — Next.js (TypeScript), deployed to Vercel.
-- `mobile/` — React Native + Expo + TypeScript, shipped via Expo EAS.
 - `infra/` — Terraform (google, neon, vercel providers). See `infra/README.md`.
 
 ## Development Mindset
@@ -26,10 +25,8 @@ Each package carries its own CLAUDE.md with full conventions:
   testing rules, logging.
 - `web/CLAUDE.md` — Next.js + TypeScript, clean architecture adapted for
   React, Vitest + Testing Library + MSW.
-- `mobile/CLAUDE.md` — Expo + React Native, mirrors the web conventions
-  with jest-expo + React Native Testing Library.
 
-All three share the same spine: dependencies point inward, framework at
+Both share the same spine: dependencies point inward, framework at
 the edges, a pure framework-free `domain/`, strict TDD, no mock libraries
 for code we own.
 

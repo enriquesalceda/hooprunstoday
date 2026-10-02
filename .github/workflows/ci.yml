@@ -282,7 +282,5 @@ jobs:
 
   # ---------------------------------------------------------------------------
   # Web (Vercel) deploys itself via the GitHub integration — no job needed.
-  # Mobile (Expo EAS) jobs get added here when mobile/ exists:
-  #   push to main  -> eas update --branch staging
-  #   git tag       -> eas build + eas submit (behind the prod environment gate)
+  # Native iOS jobs get added here when ios/ exists.
   # ---------------------------------------------------------------------------

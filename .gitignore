@@ -7,7 +7,6 @@ backend/tmp/
 # Node
 node_modules/
 .next/
-.expo/
 
 # Terraform
 **/.terraform/

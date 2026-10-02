@@ -5,7 +5,6 @@
 | Go API | GCP Cloud Run (`us-central1`) | Terraform (this tree) |
 | Postgres | Neon (`aws-us-east-2`) | Terraform (this tree) |
 | Next.js web | Vercel | Terraform project + Vercel's own git-driven deploys |
-| Mobile | Expo EAS | EAS CLI / CI — no Terraform |
 | Terraform state | GCS bucket, workspace per environment (`staging`, `prod`) | `bootstrap/` |
 | CI auth to GCP | Workload Identity Federation (OIDC) — no stored keys | `bootstrap/` |
 

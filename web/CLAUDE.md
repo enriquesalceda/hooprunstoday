@@ -114,9 +114,9 @@ implementation; commit at green.
   explicit justification.
 - Barrel files (`index.ts` re-export hubs) — import from the real module.
 
-## Shared Domain with Mobile
+## Shared Domain with iOS
 
-`web/` and `mobile/` model the same domain against the same API. For now,
-duplicate domain types and API-client shapes deliberately and keep them
-consistent by hand. Extract a shared package only when the duplication
-demonstrably hurts — not before.
+`web/` and the native iOS app model the same domain against the same API.
+There is no shared code across TypeScript and Swift: each client mirrors
+the API contract in its own domain types and keeps them consistent by
+hand.
