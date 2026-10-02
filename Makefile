@@ -1,4 +1,4 @@
-.PHONY: test test.integration test.web test.all run docker.detach docker.down fmt db.migrate db.migration
+.PHONY: test test.integration test.web test.ios ios.project test.all run docker.detach docker.down fmt db.migrate db.migration
 
 test:
 	cd backend && go test ./...
@@ -9,7 +9,20 @@ test.integration:
 test.web:
 	cd web && npx vitest run
 
-test.all: test test.integration test.web
+IOS_SIM ?= iPhone 17
+
+# Regenerate ios/HoopRuns.xcodeproj from ios/project.yml (requires xcodegen)
+ios.project:
+	cd ios && xcodegen generate
+
+# Package tests on the Mac (fast), then the full scheme on the simulator
+test.ios: ios.project
+	cd ios/Packages/HoopRunsKit && swift test
+	cd ios && xcodebuild test -project HoopRuns.xcodeproj -scheme HoopRuns \
+		-destination 'platform=iOS Simulator,name=$(IOS_SIM)' \
+		-derivedDataPath .build/DerivedData -quiet
+
+test.all: test test.integration test.web test.ios
 
 run:
 	cd backend && go run ./cmd/api
@@ -31,3 +44,4 @@ docker.down:
 fmt:
 	cd backend && gofmt -w .
 	terraform -chdir=infra fmt -recursive
+	cd ios && swift format -i -r App UITests Packages/HoopRunsKit/Sources Packages/HoopRunsKit/Tests

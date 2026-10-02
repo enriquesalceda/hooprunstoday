@@ -8,7 +8,7 @@ run leagues.
 ```
 backend/   Go API (Clean Architecture, TDD) — GCP Cloud Run
 web/       Next.js app (App Router, TDD) — Vercel
-ios/       Native iOS app   (not created yet)
+ios/       Native iOS app (Swift, SwiftUI) — simulator only for now
 infra/     Terraform: Cloud Run + Neon + Vercel — see infra/README.md
 design/    Design system + prototypes — the source of truth for all UI
 ```
