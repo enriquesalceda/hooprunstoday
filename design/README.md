@@ -224,6 +224,29 @@ interface GameRecord { id: string; format: GameFormat; scoreFor: number; scoreAg
 ```
 Backend implications: geofence proximity check for check-in; check-in pins player to court + increments count; score submission creates a PENDING record and notifies the opponent captain for verification.
 
+## Landing Page (hoopruns.today, pre-launch)
+`landing/index.html` — self-contained, deployable to any static host (logo SVG inlined; Anton from Google Fonts; Cloudflare Turnstile from Cloudflare's CDN). Single screen, no photos, RUN DMC–style lockup, centered:
+- Top line (mono 700, 0.3em): `THE BASKETBALL APP` left, pulsing dot + `LIVE SOON` right.
+- Wordmark: HOOP/RUNS only (`assets/vector/hoopruns-stacked-white.svg` cropped to viewBox `0 -1776 4047 3512`, the .TODAY bar removed), height `min(40vh, 100vh − 345px, width-fit)`, 24–64px below the top line.
+- `.TODAY` beneath it (8–16px gap): 1px white outline, transparent fill, mono 700, 0.7em tracking, 12–20px, stretched to the wordmark's width. No heavy bars, no accent colour, no radius.
+- Offerings grid (16–40px below .TODAY; max 960px, `repeat(auto-fit, minmax(200px,1fr))` → 1 column on mobile), 1px `rgba(255,255,255,.15)` outer border + dividers. Each column: muted mono header then two Anton lines (13–16px, white):
+  - `[ 01 / COURT ]` PICKUP RUNS ALL DAY · RUN YOUR OWN LEAGUE
+  - `[ 02 / ACTION ]` RUN YOUR OWN COMPETITION · BUCKETS GET RECEIPTS
+  - `[ 03 / IDENTITY ]` YOUR CARD. YOUR CRED. · THE LOCKER ROOM
+- No COMING SOON line — status lives in the header `LIVE SOON`. Top line, grid and form share one 960px column; form sits 14–32px under the grid.
+- Page must not scroll at ≥540px viewport height on desktop.
+
+### Waitlist form
+Desktop: one row `[FIRST NAME] [EMAIL ADDRESS] [COUNTRY ▼ | MOBILE] [GET ON THE LIST]`; mobile (<720px container): all stacked full-width. Fields 46px, square, 1px `#444`, hover `#8a8a85`, focus/error white.
+- **First name** — `autocomplete="given-name"`, `autocapitalize="words"`, max 50, trimmed; capitalises each word as typed. Required (toggle `nameRequired`).
+- **Email** — `type="email"`, `inputmode="email"`, `autocomplete="email"`; required; validated on submit (RFC-style pattern, ≤254 chars). Errors: `PLEASE ENTER YOUR EMAIL ADDRESS` / `PLEASE ENTER A VALID EMAIL ADDRESS`.
+- **Mobile** — optional. Country `<select autocomplete="tel-country-code">` shows `US +1` style labels (no flag emoji — brand rule) with ▼; number `type="tel"`, `autocomplete="tel-national"`, formats live per country (US/CA/AU/GB/IE/NZ/ES/FR/DE/MX), leading trunk 0 stripped, length-checked. Empty = submits without phone. Hint `OPTIONAL · VIP DROP ALERTS` centered under the whole unit. **Production: validate with libphonenumber server-side.**
+- **Errors** — brand has no red: error = white field border + inverted chip (white bg, ink text) under that field.
+- **Button** — white/ink, inverts on hover; loading = pulsing dot + `SENDING` (uses the existing pulse; no spinner); success replaces the form with `YOU'RE ON THE LIST, <NAME>.` (+ `VIP DROP ALERTS ON · +1 …` if phone given), only on HTTP 200. Failure: `COULDN'T SEND. TRY AGAIN.` and Turnstile resets.
+- **Legal** (always shown, #8a8a85): "By providing your phone number, you agree to receive launch alerts via SMS. Consent is not a condition of purchase. Reply STOP to cancel. Msg & data rates may apply."
+- **Anti-spam** — hidden honeypot `company` (display:none; filled ⇒ fake success, nothing sent). Cloudflare Turnstile rendered explicitly, `appearance: interaction-only`, dark theme. Ships with Cloudflare's always-pass **test** sitekey `1x00000000000000000000BB` — replace with the real key and verify the token server-side (siteverify).
+- **Payload** `POST <endpoint>` JSON: `{ firstName, email (lowercased), phone: E.164 | null, country: ISO2 | null, smsConsent: boolean, turnstileToken }`. With no endpoint set the page simulates success (design mode).
+
 ## Assets
 `assets/` is the complete brand pack (see `assets/README.txt` for usage rules):
 - PNG wordmarks (stacked + one-line, black + white), app icons, favicon.
@@ -239,6 +262,7 @@ Backend implications: geofence proximity check for check-in; check-in pins playe
 - `prototypes/hoopruns-signup-mobile.html` — self-contained sign-up flow, mobile (390×844, 6 screens + legend).
 - `prototypes/hoopruns-signup-web.html` — self-contained sign-up flow, web (1280×820, same 6 screens).
 - `prototypes/hoopruns-web-app.html` — self-contained desktop web prototype: same 4 workflows, same logic/tokens, adapted to a 1280×820 browser viewport. Layout deltas: top bar replaces bottom nav (logo left, 3-segment nav center, telemetry right, 58px tall); Radar is two-column (court directory flex + 400px bulletin rail, 1px divider); Check-in is a centered slate (court name Anton 96px, 640px slider); Profile is a 360px portrait/ID column + detail column grid; Log Game is a centered 680px form. Hover states (row bg #1a1a19, nav/tab text → white) replace mobile pressed states.
+- `landing/index.html` — the pre-launch hoopruns.today homepage, deploy-ready.
 - `brand/hoopruns-brand-sheet.html` — self-contained brand sheet: logo construction, lockups, color/type rules, usage do/don'ts. The visual identity reference for all surfaces.
 - `system/` — the full design system: `styles.css` + `tokens/` (colors, type, spacing, borders, motion as CSS custom properties), 32 React components in `components/` (each with a `.d.ts` and a `.prompt.md` usage rule), foundation specimen cards in `guidelines/`, and React UI kits for both products in `ui_kits/` (each with an `index.html` core-loop flow, a `signup.html` sign-up flow, and a `verify.html` score-verification flow; `ui_kits/signupData.jsx` and `ui_kits/verifyData.jsx` hold the `useSignupForm()` and `useVerifyQueue()` state machines both platforms share). `system/readme.md` is the written system — authentication stance, content voice, visual foundations, iconography position. `system/SKILL.md` makes the folder loadable as an Agent Skill so Claude Code can design new screens on-brand.
 - `assets/` — brand asset pack.
